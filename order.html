@@ -35,10 +35,10 @@ main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;oversc
 .hero:after{width:220px;height:220px;background:radial-gradient(circle,#f472b699,transparent 70%);bottom:-100px;right:-60px}
 .hero>*{position:relative;z-index:1}
 .hero h1{margin:0 0 6px;font-size:26px;font-weight:800;line-height:1.3}.hero p{margin:0;opacity:.92;font-size:14px;line-height:1.7}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.chips span{background:#ffffff26;border:1px solid #ffffff33;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:14px;padding-top:12px;border-top:1px solid #ffffff2e;font-size:13px;font-weight:600}.chips span{background:none;border:0;padding:0;cursor:default;pointer-events:none;user-select:none}.chips span:before{content:"✓ ";color:#86efac;font-weight:800}
 .tile{display:flex;align-items:center;gap:14px;width:100%;border:0;border-radius:22px;padding:20px 18px;margin-bottom:14px;color:#fff;text-align:right;cursor:pointer;font-family:inherit;box-shadow:0 14px 26px #0f172a26;transition:transform .15s}
 .tile:active{transform:scale(.98)}
-.t1{background:linear-gradient(135deg,#6366f1,#8b5cf6 55%,#d946ef)}.t2{background:linear-gradient(135deg,#0ea5e9,#14b8a6 60%,#22c55e)}
+.t1{position:relative;padding:26px 18px;background:linear-gradient(135deg,#6366f1,#8b5cf6 55%,#d946ef);animation:glow 2s ease-in-out infinite}.t1 b{font-size:21px}.badge{position:absolute;top:-11px;left:16px;background:#facc15;color:#422006;font-size:12px;font-weight:800;padding:3px 12px;border-radius:20px;box-shadow:0 2px 6px #0003}.t2{padding:14px 18px;background:#fff;color:#0f766e;border:2px solid #99f6e4;box-shadow:0 2px 6px #0f172a0f}.tile.t2 .ico{background:#ccfbf1}.t2 b{font-size:16px}@keyframes glow{0%,100%{box-shadow:0 14px 26px #7c3aed55,0 0 0 0 #8b5cf655}50%{box-shadow:0 14px 30px #7c3aed77,0 0 0 9px #8b5cf61f}}@media (prefers-reduced-motion:reduce){.t1{animation:none}}
 .tile .ico{flex:none;width:56px;height:56px;border-radius:18px;background:#ffffff33;display:grid;place-items:center}.tile .ico svg{width:30px;height:30px}
 .tile b{display:block;font-size:18px;font-weight:800;white-space:nowrap}.tile small{opacity:.92;font-size:13px}
 .tile .go{margin-inline-start:auto;opacity:.85}
@@ -127,9 +127,9 @@ textarea{resize:none;min-height:110px;line-height:1.6}
       <div class="hero">
         <h1>أهلًا بك في XERIA 👋</h1>
         <p>نصمم لك نظام إدارة يناسب نشاطك ويوفّر وقتك. ابدأ طلبك الآن أو تابع حالة طلبك الحالي.</p>
-        <div class="chips"><span>⚡ تنفيذ سريع</span><span>🔒 آمن</span><span>📱 على الموبايل</span></div>
+        <div class="chips"><span>تنفيذ سريع</span><span>آمن</span><span>يعمل على الموبايل والكمبيوتر</span></div>
       </div>
-      <button class="tile t1" type="button" data-go="new"><span class="ico"><svg class="i"><use href="#i-plus"/></svg></span><span><b>إضافة طلب جديد</b><small>اطلب نظامك في دقيقة واحدة</small></span><svg class="i go"><use href="#i-go"/></svg></button>
+      <button class="tile t1" type="button" data-go="new"><span class="badge">ابدأ من هنا</span><span class="ico"><svg class="i"><use href="#i-plus"/></svg></span><span><b>إضافة طلب جديد</b><small>اطلب نظامك في دقيقة واحدة</small></span><svg class="i go"><use href="#i-go"/></svg></button>
       <button class="tile t2" type="button" data-go="track"><span class="ico"><svg class="i"><use href="#i-search"/></svg></span><span><b>استعلام عن طلب حالي</b><small>اعرف حالة طلبك برقمه</small></span><svg class="i go"><use href="#i-go"/></svg></button>
       <button class="ghost" type="button" data-go="inquiry"><svg class="i"><use href="#i-chat"/></svg>عندك استفسار أو شكوى؟</button>
       <h3 class="sec">تواصل معنا</h3>
@@ -243,7 +243,7 @@ function route() {
   if (b) { $("act").textContent = b[0]; act = b[1]; }
   $("main").scrollTo(0, 0); fit();
 }
-const resetNew = () => { $("newForm").classList.remove("hide"); $("okNew").classList.add("hide"); $("f").reset(); $("description").value = ""; logoFile = null; $("prev").classList.add("hide"); $("act").disabled = false; };
+const resetNew = () => { $("newForm").classList.remove("hide"); $("okNew").classList.add("hide"); $("f").reset(); $("cycle").value = "MONTHLY"; renderPlan("TRIAL"); $("description").value = ""; logoFile = null; $("prev").classList.add("hide"); $("act").disabled = false; };
 const resetInq = () => { $("inqForm").classList.remove("hide"); $("okInq").classList.add("hide"); ["iName", "iPhone", "iNum", "iMsg"].forEach(i => $(i).value = ""); $("act").disabled = false; };
 const go = v => { location.hash = v === "home" ? "" : v; route(); };
 document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); if (g.dataset.go === "new" && !$("okNew").classList.contains("hide")) resetNew(); if (g.dataset.go === "inquiry" && !$("okInq").classList.contains("hide")) resetInq(); go(g.dataset.go); } });
@@ -259,11 +259,11 @@ const PLAN_AR = { TRIAL: "تجربة مجانية", START: "Start", PRO: "Pro", 
 const priced = k => ["START", "PRO", "BUSINESS"].includes(k);
 function planText(k) { const y = $("cycle").value === "YEARLY", sfx = y ? "Yearly" : "Monthly"; return k === "TRIAL" ? "مجانًا" : k === "CUSTOM" ? "حسب المطلوب" : fmt(P[k.toLowerCase() + sfx]) + " جنيه " + (y ? "سنويًا" : "شهريًا"); }
 function renderPlan(keep) {
-  const sel = keep || $("plan").value || "PRO";
-  $("plan").innerHTML = Object.keys(PLAN_AR).map(k => `<option value="${k}" ${k === sel ? "selected" : ""}>${PLAN_AR[k]} — ${planText(k)}${k === "PRO" ? " ⭐" : ""}</option>`).join("");
+  const sel = keep || $("plan").value || "TRIAL";
+  $("plan").innerHTML = Object.keys(PLAN_AR).map(k => `<option value="${k}" ${k === sel ? "selected" : ""}>${PLAN_AR[k]} — ${planText(k)}${k === "TRIAL" ? " ⭐" : ""}</option>`).join("");
   const k = $("plan").value; $("cycleWrap").classList.toggle("hide", !priced(k)); $("planName").textContent = PLAN_AR[k]; $("planPrice").textContent = planText(k);
 }
-$("plan").onchange = () => renderPlan($("plan").value); $("cycle").onchange = () => renderPlan($("plan").value); renderPlan("PRO");
+$("plan").onchange = () => renderPlan($("plan").value); $("cycle").onchange = () => renderPlan($("plan").value); renderPlan("TRIAL");
 
 // ---------- أنواع النشاط ----------
 ["محل تجاري","بيع بالتقسيط","عيادة","مركز طبي","مكتب محاماة","مخزن","شركة","مكتب إداري","مطعم / كافيه","نشاط آخر"].forEach(t => $("businessType").add(new Option(t, t)));
