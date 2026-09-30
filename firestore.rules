@@ -26,7 +26,8 @@ service cloud.firestore {
            'branchesCount','expectedUsers','logoUrl','createdAt','updatedAt'])
         && request.resource.data.fullName is string && request.resource.data.fullName.size() > 1 && request.resource.data.fullName.size() < 120
         && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() < 20
-        && request.resource.data.businessName is string && request.resource.data.businessName.size() > 0;
+        && request.resource.data.businessName is string && request.resource.data.businessName.size() > 0
+        && (!('logoUrl' in request.resource.data) || (request.resource.data.logoUrl is string && request.resource.data.logoUrl.size() < 150000));
       allow read: if hasRole(['admin','manager','callcenter','execution','accounts']);
       allow update: if hasRole(['admin','callcenter']);
       allow delete: if isAdmin();
@@ -46,6 +47,7 @@ service cloud.firestore {
         && request.resource.data.selectedPlan in ['TRIAL','START','PRO','BUSINESS','CUSTOM']
         && !('callCenterNotes' in request.resource.data.keys())
         && request.resource.data.phoneKey is string
+        && (!('audioUrl' in request.resource.data) || (request.resource.data.audioUrl is string && request.resource.data.audioUrl.size() < 700000))
         && getAfter(/databases/$(database)/documents/rateLimits/$(request.resource.data.phoneKey)).data.lastAt == request.time;
       allow read: if hasRole(['admin','manager','callcenter','execution']);
       allow update: if hasRole(['admin','callcenter','execution']);
