@@ -67,6 +67,37 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+
+    // استعلام العميل عن طلبه: لقطة عامة بدون بيانات حساسة. المعرّف = رقم الطلب + آخر 10 أرقام من الهاتف
+    // (get فقط، بدون list) فلا يمكن تصفح طلبات الآخرين. يُنشئها النموذج العام مرة واحدة، ويحدّثها الموظفون.
+    match /publicStatus/{id} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if id.matches('XR-[0-9]{6}-[0-9]{10}')
+        && request.resource.data.keys().hasOnly(['requestId','requestNumber','plan','stage','clientNote','callbackText','systemUrl','createdAt','updatedAt'])
+        && request.resource.data.stage == 'RECEIVED' && request.resource.data.clientNote == '' && request.resource.data.systemUrl == ''
+        && request.resource.data.requestId is string
+        && existsAfter(/databases/$(database)/documents/requests/$(request.resource.data.requestId));
+      allow create, update, delete: if hasRole(['admin','callcenter','execution']);
+    }
+
+    // الاستفسارات والشكاوى من الصفحة العامة (إنشاء فقط) — مع حد: رسالة واحدة لكل رقم كل 10 دقائق
+    match /inquiries/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['fullName','phone','kind','requestNumber','message','status','rlKey','createdAt'])
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() > 1 && request.resource.data.fullName.size() < 100
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() < 20
+        && request.resource.data.kind in ['INQUIRY','COMPLAINT']
+        && request.resource.data.requestNumber is string && request.resource.data.requestNumber.size() < 20
+        && request.resource.data.message is string && request.resource.data.message.size() > 2 && request.resource.data.message.size() <= 1500
+        && request.resource.data.status == 'NEW'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.rlKey is string && request.resource.data.rlKey.matches('inq-[0-9]{10}')
+        && getAfter(/databases/$(database)/documents/rateLimits/$(request.resource.data.rlKey)).data.lastAt == request.time;
+      allow read: if hasRole(['admin','manager','callcenter']);
+      allow update: if hasRole(['admin','callcenter']);
+      allow delete: if isAdmin();
+    }
+
     // الإيصال الإلكتروني: قراءة بالرابط فقط (ID عشوائي)، لا يمكن سرد الإيصالات
     match /receipts/{id} {
       allow get: if true;

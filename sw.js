@@ -1,5 +1,5 @@
 // Service Worker: يخزّن ملفات الواجهة فقط (لا بيانات Firestore) ويحدّثها في الخلفية
-const V = "xeria-v1", SHELL = ["./", "index.html", "manifest.json", "src/style.css"];
+const V = "xeria-v2", SHELL = ["./", "index.html", "manifest.json", "src/style.css"];
 self.addEventListener("install", e => e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener("activate", e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => clients.claim())));
 self.addEventListener("fetch", e => {

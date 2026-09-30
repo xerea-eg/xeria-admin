@@ -3,221 +3,296 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="theme-color" content="#ffffff">
-<title>اطلب نظامك من XERIA</title>
+<meta name="theme-color" content="#1e1b6e">
+<title>XERIA — اطلب نظامك وتابع طلبك</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3f5fa;--card:#fff;--text:#0f172a;--mut:#64748b;--line:#dfe4ee;--a1:#4f46e5;--a2:#2563eb;--err:#dc2626;--wa:#22c55e}
+:root{--bg:#f3f5fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#dfe4ee;--a1:#4f46e5;--a2:#2563eb;--err:#dc2626;--wa:#22c55e}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
-body{font-family:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text)}
+body{font-family:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink)}
 .app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:600px;margin:0 auto;background:var(--bg);position:relative}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+svg.f{fill:currentColor;stroke:none}
 
 /* الهيدر ثابت */
-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;z-index:5}
-.brand{font-weight:800;font-size:22px;letter-spacing:3px;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
-.tag{font-size:12px;color:var(--mut);margin-top:2px}
-.wa-h{flex:none;width:44px;height:44px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 4px 12px #22c55e55}
-.wa-h svg{width:26px;height:26px;fill:#fff}
+header{flex:none;display:flex;align-items:center;gap:10px;color:#fff;background:linear-gradient(120deg,#0b1140,#2e2a9a 55%,#6d28d9);padding:calc(10px + env(safe-area-inset-top)) 14px 10px;z-index:5;box-shadow:0 4px 18px #1e1b6e55}
+.back{flex:none;width:40px;height:40px;border-radius:12px;border:0;background:#ffffff26;color:#fff;display:grid;place-items:center;cursor:pointer}
+.ttl{flex:1;min-width:0}.brand{font-weight:800;font-size:22px;letter-spacing:3px;line-height:1.1}.tag{font-size:12px;opacity:.8;margin-top:2px}
+.wa-h{flex:none;width:44px;height:44px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;box-shadow:0 4px 14px #22c55e77}
+.wa-h svg{width:26px;height:26px}
 
 /* المحتوى فقط هو اللي بيتمرر */
-main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px 24px}
+main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px 28px}
+.view{display:none}.view.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* الشاشة الرئيسية */
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:24px 20px;color:#fff;background:linear-gradient(135deg,#1e1b6e,#4f46e5 50%,#9333ea);box-shadow:0 16px 32px #4f46e544;margin-bottom:16px}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%}
+.hero:before{width:190px;height:190px;background:radial-gradient(circle,#22d3ee99,transparent 70%);top:-70px;left:-50px}
+.hero:after{width:220px;height:220px;background:radial-gradient(circle,#f472b699,transparent 70%);bottom:-100px;right:-60px}
+.hero>*{position:relative;z-index:1}
+.hero h1{margin:0 0 6px;font-size:26px;font-weight:800;line-height:1.3}.hero p{margin:0;opacity:.92;font-size:14px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.chips span{background:#ffffff26;border:1px solid #ffffff33;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+.tile{display:flex;align-items:center;gap:14px;width:100%;border:0;border-radius:22px;padding:20px 18px;margin-bottom:14px;color:#fff;text-align:right;cursor:pointer;font-family:inherit;box-shadow:0 14px 26px #0f172a26;transition:transform .15s}
+.tile:active{transform:scale(.98)}
+.t1{background:linear-gradient(135deg,#6366f1,#8b5cf6 55%,#d946ef)}.t2{background:linear-gradient(135deg,#0ea5e9,#14b8a6 60%,#22c55e)}
+.tile .ico{flex:none;width:56px;height:56px;border-radius:18px;background:#ffffff33;display:grid;place-items:center}.tile .ico svg{width:30px;height:30px}
+.tile b{display:block;font-size:18px;font-weight:800;white-space:nowrap}.tile small{opacity:.92;font-size:13px}
+.tile .go{margin-inline-start:auto;opacity:.85}
+.ghost{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid #c7d2fe;background:#fff;color:var(--a1);border-radius:16px;padding:14px;font:700 16px "Cairo",inherit;cursor:pointer}
+h3.sec{font-size:16px;font-weight:800;margin:22px 0 10px}
+.contact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cc{display:flex;align-items:center;gap:8px;min-width:0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-decoration:none;color:var(--ink);box-shadow:0 1px 2px #0f172a0a}
+.cc .b{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff}
+.cc.w .b{background:var(--wa)}.cc.p .b{background:linear-gradient(135deg,#2563eb,#4f46e5)}.cc.o .b{background:#0ea5e9}
+.cc small{display:block;color:var(--mut);font-size:12px}.cc b.n{font-size:13px;direction:ltr;display:block;text-align:right;white-space:nowrap}.cc .b{width:38px!important;height:38px!important}
+.foot{text-align:center;color:var(--mut);font-size:12px;margin-top:22px}
+
+/* عناصر النماذج */
 h2.st{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;margin:4px 0 10px}
 h2.st i{font-style:normal;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-size:13px;display:grid;place-items:center}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 2px #0f172a0a}
-
-.toggle{display:flex;gap:4px;background:#e8ecf5;padding:4px;border-radius:12px;margin-bottom:12px}
-.toggle button{flex:1;border:0;background:none;color:var(--mut);padding:10px;border-radius:9px;font:600 15px "Cairo",inherit;cursor:pointer}
-.toggle button.on{background:var(--card);color:var(--a1);box-shadow:0 1px 4px #0f172a1f}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
-.plan{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 8px 12px;text-align:center;position:relative;cursor:pointer;transition:.15s}
-.plan.sel{border-color:var(--a2);background:#eff4ff;box-shadow:0 0 0 3px #2563eb22}
-.plan b{font-size:16px}.plan .pr{font-size:17px;margin-top:4px;font-weight:800;color:var(--a1)}.plan small{color:var(--mut);font-size:12px;display:block;min-height:16px}
-.plan:last-child:nth-child(odd){grid-column:1/-1}
-.badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;white-space:nowrap}
-
-form{display:grid;gap:14px}
-label{font-size:14px;font-weight:600;color:#334155;display:grid;gap:6px}
-label em{color:var(--err);font-style:normal}
-input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--text);font:400 16px "Cairo",inherit;outline:none;transition:.15s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 1px 2px #0f172a0a;margin-bottom:16px}
+form,.fg{display:grid;gap:14px}
+label{font-size:14px;font-weight:600;color:#334155;display:grid;gap:6px}label em{color:var(--err);font-style:normal}
+input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font:400 16px "Cairo",inherit;outline:none;transition:.15s}
 input:focus,select:focus,textarea:focus{border-color:var(--a2);box-shadow:0 0 0 3px #2563eb22}
 textarea{resize:none;min-height:110px;line-height:1.6}
-.btn{border:0;border-radius:12px;padding:13px 16px;color:#fff;background:linear-gradient(90deg,var(--a1),var(--a2));font:700 16px "Cairo",inherit;cursor:pointer}
-.mic{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#eff4ff;color:var(--a2);border:1.5px solid #c7d7fe}
-.mic svg{width:20px;height:20px;fill:currentColor}
+.price{display:flex;align-items:center;justify-content:space-between;background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:10px 14px;color:#3730a3;font-weight:700}
+.price b{font-size:18px}
+.btn{border:0;border-radius:12px;padding:13px 16px;color:#fff;background:linear-gradient(90deg,var(--a1),var(--a2));font:700 16px "Cairo",inherit;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.wa{background:var(--wa)}.btn.g{background:#eef2ff;color:var(--a1)}
+.mic{width:100%;background:#eff4ff;color:var(--a2);border:1.5px solid #c7d7fe}.mic svg{width:20px;height:20px}
 .mic.on{background:#fee2e2;color:#b91c1c;border-color:#fecaca;animation:pulse 1.2s infinite}
 @keyframes pulse{50%{opacity:.6}}
 .hint{font-size:12px;color:var(--mut);margin:-6px 0 0}
 .file{border:1.5px dashed #c5cde0;border-radius:12px;padding:12px;display:grid;gap:8px;font-size:14px;font-weight:600;color:#334155;background:#fafbfe}
-.file input{padding:8px;font-size:14px;border-style:solid}
-#prev{max-width:80px;max-height:80px;border-radius:10px;border:1px solid var(--line)}
+.file input{padding:8px;font-size:14px}#prev{max-width:80px;max-height:80px;border-radius:10px;border:1px solid var(--line)}
+.seg{display:flex;gap:6px;background:#e8ecf5;padding:4px;border-radius:12px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:11px;border-radius:9px;font:700 15px "Cairo",inherit;cursor:pointer}.seg button.on{background:#fff;color:var(--a1);box-shadow:0 1px 4px #0f172a1f}
+.help{display:flex;align-items:center;gap:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:14px}
+.help p{margin:0;font-size:14px;color:#14532d;flex:1;line-height:1.6}.help a{flex:none;padding:10px 14px;font-size:14px}
 
-.help{margin-top:16px;display:flex;align-items:center;gap:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:14px}
-.help p{margin:0;font-size:14px;color:#14532d;flex:1;line-height:1.6}
-.help a{flex:none;display:flex;align-items:center;gap:6px;background:var(--wa);color:#fff;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px}
-.help svg{width:20px;height:20px;fill:#fff}
+/* الاستعلام */
+.res{border-radius:20px;overflow:hidden;background:#fff;border:1px solid var(--line);box-shadow:0 8px 22px #0f172a14}
+.res .top{padding:18px;color:#fff;background:linear-gradient(135deg,#0ea5e9,#14b8a6 60%,#22c55e)}
+.res .top.c{background:linear-gradient(135deg,#ef4444,#f97316)}.res .top small{opacity:.9}
+.res .num{font-size:28px;font-weight:800;letter-spacing:1px;direction:ltr;text-align:right}
+.res .bd{padding:16px;display:grid;gap:12px}
+.steps{display:flex;position:relative;margin:4px 0 2px}
+.steps:before{content:"";position:absolute;top:19px;right:12%;left:12%;height:3px;background:#e2e8f0}
+.stp{flex:1;text-align:center;position:relative;z-index:1;font-size:11.5px;color:var(--mut);font-weight:600}
+.stp i{width:40px;height:40px;border-radius:50%;background:#e2e8f0;display:grid;place-items:center;margin:0 auto 6px;font-style:normal;font-size:18px}
+.stp.done i{background:linear-gradient(135deg,#6366f1,#2563eb)}.stp.cur i{box-shadow:0 0 0 5px #6366f12e}.stp.done,.stp.cur{color:var(--ink);font-weight:800}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:12px 14px;color:#7c2d12;font-size:14px;line-height:1.7;white-space:pre-wrap}.note b{display:block;margin-bottom:2px}
+.info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px 14px;color:#1e3a8a;font-size:14px}
+.msg{font-size:14px;color:#334155;line-height:1.7;margin:0}
+.kv{display:flex;justify-content:space-between;font-size:14px;color:var(--mut)}.kv b{color:var(--ink)}
+.stack{display:grid;gap:10px}
 
-/* زرار الإرسال ثابت */
+/* الشريط السفلي الثابت */
 .bar{flex:none;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px #0f172a0d;z-index:5}
 .big{width:100%;padding:15px;font-size:18px}.big:disabled{opacity:.55}
-.err{color:var(--err);font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.6}.err:empty{display:none}
-.err a{color:#15803d;font-weight:700}
+.err{color:var(--err);font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.6}.err:empty{display:none}.err a{color:#15803d;font-weight:700}
 .hide{display:none!important}
-.ok{text-align:center;padding:36px 18px}.ok .chk{width:64px;height:64px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:34px;display:grid;place-items:center;margin:0 auto 14px}
-.ok h2{margin:0 0 10px;font-size:20px}.num{font-size:30px;font-weight:800;color:var(--a1);margin:10px 0}.ok div{color:var(--mut)}
+.ok{text-align:center;padding:30px 16px}.ok .chk{width:70px;height:70px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:36px;display:grid;place-items:center;margin:0 auto 14px}
+.ok h2{margin:0 0 8px;font-size:21px}.ok .n{font-size:30px;font-weight:800;color:var(--a1);margin:8px 0;direction:ltr}.ok div{color:var(--mut)}
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-go" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
 </defs></svg>
 
 <div class="app" id="app">
   <header>
-    <div><div class="brand">XERIA</div><div class="tag">نظّم أعمالك ببساطة</div></div>
-    <a class="wa-h" id="waTop" href="#" target="_blank" rel="noopener" aria-label="تواصل معنا على واتساب"><svg><use href="#i-wa"/></svg></a>
+    <button class="back hide" id="back" type="button" aria-label="رجوع"><svg class="i"><use href="#i-back"/></svg></button>
+    <div class="ttl"><div class="brand">XERIA</div><div class="tag" id="tag">نظّم أعمالك ببساطة</div></div>
+    <a class="wa-h" id="waTop" href="#" target="_blank" rel="noopener" aria-label="تواصل معنا على واتساب"><svg class="f"><use href="#i-wa"/></svg></a>
   </header>
 
   <main id="main">
-    <div id="formArea">
-      <h2 class="st"><i>1</i> اختار الباقة</h2>
-      <div class="toggle"><button id="mBtn" class="on" type="button">شهريًا</button><button id="yBtn" type="button">سنويًا</button></div>
-      <div class="plans" id="plans"></div>
-
-      <h2 class="st"><i>2</i> بياناتك</h2>
-      <div class="card">
-        <form id="f" novalidate>
-          <label><span>الاسم <em>*</em></span><input id="fullName" maxlength="100" autocomplete="name" placeholder="اسمك بالكامل"></label>
-          <label><span>رقم الهاتف (واتساب) <em>*</em></span><input id="phone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
-          <label><span>اسم النشاط <em>*</em></span><input id="businessName" maxlength="100" placeholder="مثال: صيدلية النور"></label>
-          <label><span>نوع النشاط <em>*</em></span><select id="businessType"><option value="">اختر...</option></select></label>
-          <label id="otherWrap" class="hide"><span>اكتب نوع نشاطك <em>*</em></span><input id="otherType" maxlength="60"></label>
-
-          <label><span>احتياجك (اختياري)</span>
-            <textarea id="description" maxlength="1500" placeholder="اكتب هنا أو اضغط الميكروفون وتكلم"></textarea>
-          </label>
-          <button type="button" class="btn mic" id="mic"></button>
-          <p class="hint" id="micHint"></p>
-
-          <div class="file">
-            <span>لوجو النشاط (اختياري)</span>
-            <input id="logo" type="file" accept="image/*">
-            <img id="prev" class="hide" alt="">
-          </div>
-
-          <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;opacity:0">
-        </form>
+    <!-- 1) الرئيسية: زرّان كبيران -->
+    <section class="view on" id="v-home">
+      <div class="hero">
+        <h1>أهلًا بك في XERIA 👋</h1>
+        <p>نصمم لك نظام إدارة يناسب نشاطك ويوفّر وقتك. ابدأ طلبك الآن أو تابع حالة طلبك الحالي.</p>
+        <div class="chips"><span>⚡ تنفيذ سريع</span><span>🔒 آمن</span><span>📱 على الموبايل</span></div>
       </div>
+      <button class="tile t1" type="button" data-go="new"><span class="ico"><svg class="i"><use href="#i-plus"/></svg></span><span><b>إضافة طلب جديد</b><small>اطلب نظامك في دقيقة واحدة</small></span><svg class="i go"><use href="#i-go"/></svg></button>
+      <button class="tile t2" type="button" data-go="track"><span class="ico"><svg class="i"><use href="#i-search"/></svg></span><span><b>استعلام عن طلب حالي</b><small>اعرف حالة طلبك برقمه</small></span><svg class="i go"><use href="#i-go"/></svg></button>
+      <button class="ghost" type="button" data-go="inquiry"><svg class="i"><use href="#i-chat"/></svg>عندك استفسار أو شكوى؟</button>
+      <h3 class="sec">تواصل معنا</h3>
+      <div class="contact" id="contact"></div>
+      <div class="foot">© XERIA — نظّم أعمالك ببساطة</div>
+    </section>
 
-      <div class="help">
-        <p>واجهت مشكلة في تسجيل البيانات؟ ابعتلنا على واتساب وهنساعدك.</p>
-        <a id="waHelp" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>واتساب</a>
+    <!-- 2) طلب جديد -->
+    <section class="view" id="v-new">
+      <div id="newForm">
+        <h2 class="st"><i>1</i> اختار الباقة</h2>
+        <div class="card"><div class="fg">
+          <label><span>الباقة</span><select id="plan"></select></label>
+          <label id="cycleWrap"><span>مدة الاشتراك</span><select id="cycle"><option value="MONTHLY">شهري</option><option value="YEARLY">سنوي</option></select></label>
+          <div class="price"><span id="planName"></span><b id="planPrice"></b></div>
+        </div></div>
+
+        <h2 class="st"><i>2</i> بياناتك</h2>
+        <div class="card">
+          <form id="f" novalidate>
+            <label><span>الاسم <em>*</em></span><input id="fullName" maxlength="100" autocomplete="name" placeholder="اسمك بالكامل"></label>
+            <label><span>رقم الهاتف (واتساب) <em>*</em></span><input id="phone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+            <label><span>اسم النشاط <em>*</em></span><input id="businessName" maxlength="100" placeholder="مثال: صيدلية النور"></label>
+            <label><span>نوع النشاط <em>*</em></span><select id="businessType"><option value="">اختر...</option></select></label>
+            <label id="otherWrap" class="hide"><span>اكتب نوع نشاطك <em>*</em></span><input id="otherType" maxlength="60"></label>
+            <label><span>احتياجك (اختياري)</span><textarea id="description" maxlength="1500" placeholder="اكتب هنا أو اضغط الميكروفون وتكلم"></textarea></label>
+            <button type="button" class="btn mic" id="mic"></button>
+            <p class="hint" id="micHint"></p>
+            <div class="file"><span>لوجو النشاط (اختياري)</span><input id="logo" type="file" accept="image/*"><img id="prev" class="hide" alt=""></div>
+            <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;opacity:0">
+          </form>
+        </div>
+        <div class="help"><p>واجهت مشكلة في تسجيل البيانات؟ ابعتلنا على واتساب وهنساعدك.</p><a class="btn wa" id="waHelp" href="#" target="_blank" rel="noopener"><svg class="i f"><use href="#i-wa"/></svg>واتساب</a></div>
       </div>
-    </div>
+      <div class="card ok hide" id="okNew"><div class="chk">✓</div><h2>تم استلام طلبك</h2><div>رقم طلبك — احتفظ به لمتابعة الطلب</div><div class="n" id="reqNum"></div>
+        <div>فريق XERIA هيتواصل معاك قريبًا.</div>
+        <div class="stack" style="margin-top:16px"><button class="btn g" type="button" data-track-now>🔍 تابع حالة طلبك</button><button class="btn g" type="button" data-go="home">الرئيسية</button></div></div>
+    </section>
 
-    <div class="card ok hide" id="ok">
-      <div class="chk">✓</div>
-      <h2>تم استلام طلبك</h2>
-      <div>رقم طلبك</div><div class="num" id="reqNum"></div>
-      <div>فريق XERIA هيتواصل معاك قريبًا.</div>
-    </div>
+    <!-- 3) استعلام -->
+    <section class="view" id="v-track">
+      <h2 class="st"><i>🔍</i> استعلام عن طلب</h2>
+      <div class="card"><div class="fg">
+        <label><span>رقم الطلب <em>*</em></span><input id="tNum" inputmode="text" maxlength="12" placeholder="XR-000123" dir="ltr" autocomplete="off"></label>
+        <label><span>رقم الهاتف المسجل في الطلب <em>*</em></span><input id="tPhone" type="tel" inputmode="tel" maxlength="15" placeholder="01xxxxxxxxx" autocomplete="tel"></label>
+        <p class="hint" style="margin:0">بنطلب رقم الهاتف لحماية بيانات الطلبات.</p>
+      </div></div>
+      <div id="trackRes"></div>
+    </section>
+
+    <!-- 4) استفسار / شكوى -->
+    <section class="view" id="v-inquiry">
+      <div id="inqForm">
+        <h2 class="st"><i>💬</i> استفسار أو شكوى</h2>
+        <div class="card"><div class="fg">
+          <div class="seg" id="kindSeg"><button type="button" data-k="INQUIRY" class="on">استفسار</button><button type="button" data-k="COMPLAINT">شكوى</button></div>
+          <label><span>الاسم <em>*</em></span><input id="iName" maxlength="100" autocomplete="name"></label>
+          <label><span>رقم الهاتف <em>*</em></span><input id="iPhone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+          <label><span>رقم الطلب (لو عندك طلب)</span><input id="iNum" maxlength="12" placeholder="XR-000123" dir="ltr" autocomplete="off"></label>
+          <label><span>رسالتك <em>*</em></span><textarea id="iMsg" maxlength="1500" placeholder="اكتب استفسارك أو شكواك بالتفصيل"></textarea></label>
+          <input id="iWeb" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;opacity:0">
+        </div></div>
+      </div>
+      <div class="card ok hide" id="okInq"><div class="chk">✓</div><h2>وصلتنا رسالتك</h2><div>هنراجعها ونتواصل معاك في أقرب وقت.</div>
+        <div class="stack" style="margin-top:16px"><a class="btn wa" id="waInq" href="#" target="_blank" rel="noopener"><svg class="i f"><use href="#i-wa"/></svg>تواصل معنا على واتساب</a><button class="btn g" type="button" data-go="home">الرئيسية</button></div></div>
+    </section>
   </main>
 
-  <div class="bar" id="bar">
+  <div class="bar hide" id="bar">
     <div class="err" id="err"></div>
-    <button class="btn big" id="submit" type="button">إرسال الطلب</button>
+    <button class="btn big" id="act" type="button"></button>
   </div>
 </div>
 
 <script type="module">
 import { db, COL } from "./src/firebase.js";
-import { doc, collection, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const $ = id => document.getElementById(id);
+import { doc, collection, getDoc, runTransaction, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const $ = id => document.getElementById(id), $$ = s => document.querySelectorAll(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 
-// ---------- ثبات الواجهة: منع التكبير بالقرصة، وإبقاء الهيدر والزرار في مكانهم مع الكيبورد ----------
+// ---------- إعدادات التواصل (اتركها فاضية لإخفائها) ----------
+const CONTACT = { phone: "01152155717", whatsapp: "01152155717", email: "" };
+const intl = p => { let d = digits(p); if (d.startsWith("00")) d = d.slice(2); else if (d.startsWith("0")) d = "20" + d.slice(1); return d; };
+function digits(s) { return String(s ?? "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g, ""); }
+const toLatin = s => String(s).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+const waHref = "https://api.whatsapp.com/send?phone=" + intl(CONTACT.whatsapp) + "&text=" + encodeURIComponent("مرحبًا، عندي مشكلة/استفسار بخصوص طلب على XERIA");
+$("waTop").href = waHref; $("waHelp").href = waHref; $("waInq").href = waHref;
+$("contact").innerHTML =
+  (CONTACT.whatsapp ? `<a class="cc w" href="${waHref}" target="_blank" rel="noopener"><span class="b"><svg class="i f"><use href="#i-wa"/></svg></span><span><small>واتساب</small><b class="n">${esc(CONTACT.whatsapp)}</b></span></a>` : "") +
+  (CONTACT.phone ? `<a class="cc p" href="tel:+${intl(CONTACT.phone)}"><span class="b"><svg class="i"><use href="#i-phone"/></svg></span><span><small>اتصال</small><b class="n">${esc(CONTACT.phone)}</b></span></a>` : "") +
+  (CONTACT.email ? `<a class="cc o" href="mailto:${esc(CONTACT.email)}"><span class="b"><svg class="i"><use href="#i-mail"/></svg></span><span><small>البريد</small><b class="n">${esc(CONTACT.email)}</b></span></a>` : "");
+const WA_LINK = ` أو <a href="${waHref}" target="_blank" rel="noopener">ابعتلنا على واتساب</a>.`;
+
+// ---------- ثبات الواجهة ----------
 ["gesturestart", "gesturechange", "gestureend"].forEach(t => document.addEventListener(t, e => e.preventDefault()));
 document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 const vv = window.visualViewport;
 const fit = () => { if (!vv || vv.scale <= 1.01) $("app").style.height = (vv ? vv.height : innerHeight) + "px"; };
 if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", () => scrollTo(0, 0)); } addEventListener("resize", fit); fit();
 
-// ---------- واتساب ----------
-const WA = "https://wa.me/201152155717?text=" + encodeURIComponent("مرحبًا، عندي مشكلة في تسجيل طلب على نموذج XERIA");
-$("waTop").href = WA; $("waHelp").href = WA;
-const WA_LINK = ` أو <a href="${WA}" target="_blank" rel="noopener">ابعتلنا على واتساب</a>.`;
+// ---------- التنقل بين الشاشات (hash) ----------
+const VIEWS = ["home", "new", "track", "inquiry"];
+const BAR = { new: ["إرسال الطلب", () => submitOrder()], track: ["🔍 بحث", () => doTrack()], inquiry: ["إرسال", () => sendInquiry()] };
+const TAGS = { home: "نظّم أعمالك ببساطة", new: "طلب جديد", track: "استعلام عن طلب", inquiry: "استفسار أو شكوى" };
+let cur = "home", act = null;
+function route() {
+  const h = location.hash.slice(1); cur = VIEWS.includes(h) ? h : "home";
+  VIEWS.forEach(v => $("v-" + v).classList.toggle("on", v === cur));
+  $("back").classList.toggle("hide", cur === "home"); $("tag").textContent = TAGS[cur]; $("err").textContent = "";
+  const b = BAR[cur]; $("bar").classList.toggle("hide", !b || (cur === "new" && !$("okNew").classList.contains("hide")) || (cur === "inquiry" && !$("okInq").classList.contains("hide")));
+  if (b) { $("act").textContent = b[0]; act = b[1]; }
+  $("main").scrollTo(0, 0); fit();
+}
+const resetNew = () => { $("newForm").classList.remove("hide"); $("okNew").classList.add("hide"); $("f").reset(); $("description").value = ""; logoFile = null; $("prev").classList.add("hide"); $("act").disabled = false; };
+const resetInq = () => { $("inqForm").classList.remove("hide"); $("okInq").classList.add("hide"); ["iName", "iPhone", "iNum", "iMsg"].forEach(i => $(i).value = ""); $("act").disabled = false; };
+const go = v => { location.hash = v === "home" ? "" : v; route(); };
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); if (g.dataset.go === "new" && !$("okNew").classList.contains("hide")) resetNew(); if (g.dataset.go === "inquiry" && !$("okInq").classList.contains("hide")) resetInq(); go(g.dataset.go); } });
+$("back").onclick = () => go("home");
+$("act").onclick = () => act && act();
+addEventListener("hashchange", route);
 
-// ---------- الباقات ----------
+// ---------- الباقات (قائمة منسدلة) ----------
 let P = { startMonthly:399,startYearly:3990,proMonthly:599,proYearly:5990,businessMonthly:899,businessYearly:8990 };
 try { const s = await getDoc(doc(db, COL.settings, "plans")); if (s.exists()) P = { ...P, ...s.data() }; } catch {}
-let cycle = "MONTHLY", plan = "PRO";
 const fmt = n => Number(n).toLocaleString("ar-EG");
-function renderPlans() {
-  const m = cycle === "MONTHLY", sfx = m ? "Monthly" : "Yearly", per = m ? "شهريًا" : "سنويًا";
-  const list = [
-    ["TRIAL","تجربة مجانية","مجانًا",""],
-    ["START","Start",fmt(P["start"+sfx])+" جنيه",per],
-    ["PRO","Pro",fmt(P["pro"+sfx])+" جنيه",per,"الأكثر اختيارًا"],
-    ["BUSINESS","Business",fmt(P["business"+sfx])+" جنيه",per],
-    ["CUSTOM","Custom","حسب المطلوب","نظام مخصص"]
-  ];
-  $("plans").innerHTML = list.map(([k,n,pr,sm,b]) =>
-    `<div class="plan ${plan===k?"sel":""}" data-k="${k}">${b?`<span class="badge">${b}</span>`:""}<b>${n}</b><div class="pr">${pr}</div><small>${sm}</small></div>`).join("");
-  document.querySelectorAll(".plan").forEach(e => e.onclick = () => { plan = e.dataset.k; renderPlans(); });
+const PLAN_AR = { TRIAL: "تجربة مجانية", START: "Start", PRO: "Pro", BUSINESS: "Business", CUSTOM: "Custom" };
+const priced = k => ["START", "PRO", "BUSINESS"].includes(k);
+function planText(k) { const y = $("cycle").value === "YEARLY", sfx = y ? "Yearly" : "Monthly"; return k === "TRIAL" ? "مجانًا" : k === "CUSTOM" ? "حسب المطلوب" : fmt(P[k.toLowerCase() + sfx]) + " جنيه " + (y ? "سنويًا" : "شهريًا"); }
+function renderPlan(keep) {
+  const sel = keep || $("plan").value || "PRO";
+  $("plan").innerHTML = Object.keys(PLAN_AR).map(k => `<option value="${k}" ${k === sel ? "selected" : ""}>${PLAN_AR[k]} — ${planText(k)}${k === "PRO" ? " ⭐" : ""}</option>`).join("");
+  const k = $("plan").value; $("cycleWrap").classList.toggle("hide", !priced(k)); $("planName").textContent = PLAN_AR[k]; $("planPrice").textContent = planText(k);
 }
-$("mBtn").onclick = () => { cycle="MONTHLY"; $("mBtn").className="on"; $("yBtn").className=""; renderPlans(); };
-$("yBtn").onclick = () => { cycle="YEARLY"; $("yBtn").className="on"; $("mBtn").className=""; renderPlans(); };
-renderPlans();
+$("plan").onchange = () => renderPlan($("plan").value); $("cycle").onchange = () => renderPlan($("plan").value); renderPlan("PRO");
 
 // ---------- أنواع النشاط ----------
-const TYPES = ["محل تجاري","بيع بالتقسيط","عيادة","مركز طبي","مكتب محاماة","مخزن","شركة","مكتب إداري","مطعم / كافيه","نشاط آخر"];
-TYPES.forEach(t => $("businessType").add(new Option(t, t)));
+["محل تجاري","بيع بالتقسيط","عيادة","مركز طبي","مكتب محاماة","مخزن","شركة","مكتب إداري","مطعم / كافيه","نشاط آخر"].forEach(t => $("businessType").add(new Option(t, t)));
 $("businessType").onchange = e => $("otherWrap").classList.toggle("hide", e.target.value !== "نشاط آخر");
 
 // ---------- الإملاء الصوتي (يتحول لنص، بدون تكرار) ----------
-// جلسة قصيرة (continuous=false) تُعاد تلقائيًا؛ نأخذ النتائج النهائية فقط ونتجاهل التراكمي المكرر الذي يظهر على أندرويد.
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, wantOn = false, base = "";
-const micHTML = on => `<svg><use href="#i-mic"/></svg>${on ? "إيقاف الإملاء (بيسمعك...)" : "اتكلم بدل ما تكتب"}`;
+const micHTML = on => `<svg class="i f"><use href="#i-mic"/></svg>${on ? "إيقاف الإملاء (بيسمعك...)" : "اتكلم بدل ما تكتب"}`;
 const setMic = on => { $("mic").classList.toggle("on", on); $("mic").innerHTML = micHTML(on); };
 const join = (a, b) => (a && b ? a.replace(/\s+$/, "") + " " + b : a + b);
 setMic(false);
 function startSession() {
   if (!wantOn) return;
-  base = $("description").value.trim();
-  const finals = []; let gotAny = false;
+  base = $("description").value.trim(); const finals = []; let gotAny = false;
   rec = new SR(); rec.lang = "ar-EG"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 1;
-  rec.onresult = e => {
-    gotAny = true; let interim = "";
-    for (let i = 0; i < e.results.length; i++) {
-      const r = e.results[i], t = (r[0].transcript || "").trim(); if (!t) continue;
-      if (r.isFinal) {
-        const last = finals[finals.length - 1];
-        if (last === undefined) finals.push(t);
-        else if (t.startsWith(last)) finals[finals.length - 1] = t;   // نتيجة تراكمية: استبدال بدل الإلحاق
-        else if (!last.startsWith(t) && last !== t) finals.push(t);
-      } else interim = t;   // آخر نتيجة مؤقتة فقط
-    }
-    $("description").value = join(join(base, finals.join(" ")), interim).slice(0, 1500);
-  };
-  rec.onerror = e => {
-    if (e.error === "no-speech") return;   // onend يتولى القرار
-    wantOn = false;
-    $("err").textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? "اسمح للمتصفح باستخدام الميكروفون." : e.error === "network" ? "التحويل الصوتي محتاج إنترنت." : "";
-  };
-  rec.onend = () => {
-    const v = $("description").value; $("description").value = v.replace(/\s+/g, " ").trimStart();
-    if (wantOn && gotAny) setTimeout(startSession, 150);   // كمّل الاستماع بعد كل جملة
-    else { wantOn = false; setMic(false); }
-  };
+  rec.onresult = e => { gotAny = true; let interim = "";
+    for (let i = 0; i < e.results.length; i++) { const r = e.results[i], t = (r[0].transcript || "").trim(); if (!t) continue;
+      if (r.isFinal) { const last = finals[finals.length - 1];
+        if (last === undefined) finals.push(t); else if (t.startsWith(last)) finals[finals.length - 1] = t; else if (!last.startsWith(t) && last !== t) finals.push(t);
+      } else interim = t; }
+    $("description").value = join(join(base, finals.join(" ")), interim).slice(0, 1500); };
+  rec.onerror = e => { if (e.error === "no-speech") return; wantOn = false;
+    $("err").textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? "اسمح للمتصفح باستخدام الميكروفون." : e.error === "network" ? "التحويل الصوتي محتاج إنترنت." : ""; };
+  rec.onend = () => { $("description").value = $("description").value.replace(/\s+/g, " ").trimStart(); if (wantOn && gotAny) setTimeout(startSession, 150); else { wantOn = false; setMic(false); } };
   try { rec.start(); } catch { wantOn = false; setMic(false); }
 }
 if (!SR) { $("mic").classList.add("hide"); $("micHint").textContent = "تقدر تستخدم ميكروفون كيبورد الموبايل للكتابة بالصوت."; }
-else $("mic").onclick = () => {
-  if (wantOn) { wantOn = false; try { rec.stop(); } catch {} setMic(false); return; }
-  $("err").textContent = ""; wantOn = true; setMic(true); startSession();
-};
+else $("mic").onclick = () => { if (wantOn) { wantOn = false; try { rec.stop(); } catch {} setMic(false); return; } $("err").textContent = ""; wantOn = true; setMic(true); startSession(); };
 
 // ---------- الشعار (يُصغَّر ويُحفظ داخل Firestore) ----------
 async function shrink(file) { try { const img = await createImageBitmap(file), k = Math.min(1, 400 / Math.max(img.width, img.height)), cv = document.createElement("canvas");
@@ -225,51 +300,98 @@ async function shrink(file) { try { const img = await createImageBitmap(file), k
   return await new Promise(res => cv.toBlob(b => res(b), "image/jpeg", 0.7)); } catch { return null; } }
 const toDataUrl = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
 let logoFile = null;
-$("logo").onchange = e => {
-  const f = e.target.files[0]; $("err").textContent = "";
+$("logo").onchange = e => { const f = e.target.files[0]; $("err").textContent = "";
   if (!f) { logoFile = null; $("prev").classList.add("hide"); return; }
   if (!f.type.startsWith("image/") || f.size > 10*1024*1024) { $("err").textContent = "اختار صورة أقل من 10MB."; e.target.value = ""; return; }
-  logoFile = f; $("prev").src = URL.createObjectURL(f); $("prev").classList.remove("hide");
-};
+  logoFile = f; $("prev").src = URL.createObjectURL(f); $("prev").classList.remove("hide"); };
 
-// ---------- الإرسال ----------
-const done = num => { $("reqNum").textContent = num; $("formArea").classList.add("hide"); $("bar").classList.add("hide"); $("ok").classList.remove("hide"); $("main").scrollTo(0, 0); };
-$("submit").onclick = async () => {
+// ---------- إرسال طلب جديد ----------
+let lastNum = "", lastPhone = "";
+async function submitOrder() {
   const err = $("err"); err.textContent = "";
-  if ($("website").value) return done("XR-000000");   // فخ للبوتات
+  if ($("website").value) { lastNum = "XR-000000"; return doneNew("XR-000000"); }   // فخ للبوتات
   wantOn = false; try { rec && rec.stop(); } catch {}
-  const v = id => $(id).value.trim();
-  const type = v("businessType") === "نشاط آخر" ? v("otherType") : v("businessType");
-  if (!v("fullName") || !v("phone") || !v("businessName") || !type) { err.textContent = "من فضلك أكمل الحقول المطلوبة (*)."; return; }
-  if (!/^[0-9+\s-]{8,15}$/.test(v("phone"))) { err.textContent = "رقم الهاتف غير صحيح."; return; }
-  $("submit").disabled = true; $("submit").textContent = "جارٍ الإرسال...";
+  const v = id => $(id).value.trim(), type = v("businessType") === "نشاط آخر" ? v("otherType") : v("businessType"), pd = digits(v("phone"));
+  if (!v("fullName") || !pd || !v("businessName") || !type) { err.textContent = "من فضلك أكمل الحقول المطلوبة (*)."; return; }
+  if (pd.length < 10 || pd.length > 15) { err.textContent = "رقم الهاتف غير صحيح (10 أرقام على الأقل)."; return; }
+  const plan = $("plan").value, cycle = priced(plan) ? $("cycle").value : "MONTHLY";
+  $("act").disabled = true; $("act").textContent = "جارٍ الإرسال...";
   try {
-    let logoUrl = "";
-    if (logoFile) { const b = await shrink(logoFile); if (b) logoUrl = await toDataUrl(b); if (logoUrl.length > 140000) logoUrl = ""; }
-    const custRef = doc(collection(db, COL.customers)), reqRef = doc(collection(db, COL.requests));
-    const cntRef = doc(db, COL.settings, "counters"), phoneKey = v("phone").replace(/\D/g, "").slice(-10);
+    let logoUrl = ""; if (logoFile) { const b = await shrink(logoFile); if (b) logoUrl = await toDataUrl(b); if (logoUrl.length > 140000) logoUrl = ""; }
+    const custRef = doc(collection(db, COL.customers)), reqRef = doc(collection(db, COL.requests)), cntRef = doc(db, COL.settings, "counters"), phoneKey = pd.slice(-10);
     const number = await runTransaction(db, async tx => {
-      const c = await tx.get(cntRef);
-      const seq = c.exists() ? c.data().requestSeq + 1 : 1;
+      const c = await tx.get(cntRef), seq = c.exists() ? c.data().requestSeq + 1 : 1, num = "XR-" + String(seq).padStart(6, "0"), publicId = num + "-" + phoneKey;
       tx.set(cntRef, { requestSeq: seq }, { merge: true });
       tx.set(doc(db, "rateLimits", phoneKey), { lastAt: serverTimestamp() });   // طلب واحد لكل رقم كل 10 دقائق
-      const num = "XR-" + String(seq).padStart(6, "0");
-      tx.set(custRef, { fullName: v("fullName"), phone: v("phone"), whatsapp: "", businessName: v("businessName"),
-        businessType: type, governorate: "", city: "", branchesCount: 1, expectedUsers: 1,
-        logoUrl, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-      tx.set(reqRef, { requestId: reqRef.id, requestNumber: num, customerId: custRef.id, phoneKey, selectedPlan: plan,
-        billingCycle: plan === "TRIAL" ? "TRIAL" : cycle, hasExistingSystem: false,
-        description: v("description"), audioUrl: "", attachments: [], status: "NEW",
-        createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      tx.set(custRef, { fullName: v("fullName"), phone: toLatin(v("phone")), whatsapp: "", businessName: v("businessName"), businessType: type, governorate: "", city: "", branchesCount: 1, expectedUsers: 1, logoUrl, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      tx.set(reqRef, { requestId: reqRef.id, requestNumber: num, customerId: custRef.id, phoneKey, publicId, selectedPlan: plan, billingCycle: plan === "TRIAL" ? "TRIAL" : cycle, hasExistingSystem: false,
+        description: v("description"), audioUrl: "", attachments: [], status: "NEW", createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+      tx.set(doc(db, COL.publicStatus, publicId), { requestId: reqRef.id, requestNumber: num, plan, stage: "RECEIVED", clientNote: "", callbackText: "", systemUrl: "", createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
       return num;
     });
-    done(number);
+    lastNum = number; lastPhone = toLatin(v("phone")); doneNew(number);
   } catch (x) {
     console.error(x);
     err.innerHTML = (x.code === "permission-denied" ? "تعذّر الإرسال: ممكن يكون فيه طلب من نفس الرقم خلال آخر 10 دقائق، حاول بعد شوية" : "حصل خطأ أثناء الإرسال، حاول تاني") + WA_LINK;
-    $("submit").disabled = false; $("submit").textContent = "إرسال الطلب";
+    $("act").disabled = false; $("act").textContent = "إرسال الطلب";
   }
-};
+}
+function doneNew(n) { $("reqNum").textContent = n; $("newForm").classList.add("hide"); $("okNew").classList.remove("hide"); $("bar").classList.add("hide"); $("main").scrollTo(0, 0); }
+document.addEventListener("click", e => { if (!e.target.closest("[data-track-now]")) return; $("tNum").value = lastNum; $("tPhone").value = lastPhone; go("track"); doTrack(); });
+
+// ---------- استعلام عن طلب ----------
+const STAGES = [["RECEIVED", "تم الاستلام", "📥"], ["CONTACTED", "تم التواصل", "📞"], ["CONFIRMED", "جاري التنفيذ", "🛠️"], ["DONE", "نظامك جاهز", "🚀"]];
+const STAGE_MSG = { RECEIVED: "استلمنا طلبك وفريقنا هيتواصل معاك قريبًا.", CONTACTED: "تم التواصل معاك وجاري مراجعة البيانات.", CONFIRMED: "تم تأكيد طلبك وجاري تصميم نظام يناسب نشاطك.", DONE: "نظامك جاهز! 🎉 تقدر تفتحه من الزر بالأسفل.", CANCELLED: "تم إلغاء هذا الطلب. لو محتاج مساعدة تواصل معنا." };
+async function doTrack() {
+  const err = $("err"); err.textContent = ""; $("trackRes").innerHTML = "";
+  const nd = digits($("tNum").value), pk = digits($("tPhone").value).slice(-10);
+  if (!nd || pk.length < 10) { err.textContent = "اكتب رقم الطلب ورقم الهاتف (10 أرقام على الأقل)."; return; }
+  const number = "XR-" + nd.padStart(6, "0").slice(-6);
+  $("act").disabled = true; $("act").textContent = "جارٍ البحث...";
+  try {
+    const s = await getDoc(doc(db, COL.publicStatus, number + "-" + pk));
+    if (!s.exists()) { $("trackRes").innerHTML = `<div class="card"><p class="msg"><b>مش لاقيين طلب بالبيانات دي.</b><br>اتأكد من رقم الطلب ورقم الهاتف اللي سجلت بيه، أو ${WA_LINK.replace(" أو ", "")}</p></div>`; return; }
+    const d = s.data(), st = d.stage, idx = STAGES.findIndex(x => x[0] === st), cancelled = st === "CANCELLED";
+    const created = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" }) : "";
+    const url = /^https?:\/\//i.test(d.systemUrl || "") ? d.systemUrl : "";
+    $("trackRes").innerHTML = `<div class="res"><div class="top ${cancelled ? "c" : ""}"><small>رقم الطلب</small><div class="num">${esc(d.requestNumber)}</div></div><div class="bd">
+      ${cancelled ? "" : `<div class="steps">${STAGES.map((x, i) => `<div class="stp ${i < idx ? "done" : i === idx ? "done cur" : ""}"><i>${x[2]}</i>${x[1]}</div>`).join("")}</div>`}
+      <p class="msg"><b>${cancelled ? "❌ " : ""}${esc(STAGE_MSG[st] || "")}</b></p>
+      ${d.callbackText ? `<div class="info">📞 موعد الاتصال بك: <b>${esc(d.callbackText)}</b></div>` : ""}
+      ${d.clientNote ? `<div class="note"><b>📝 رسالة من فريق XERIA</b>${esc(d.clientNote)}</div>` : ""}
+      <div class="kv"><span>الباقة</span><b>${esc(PLAN_AR[d.plan] || "")}</b></div>${created ? `<div class="kv"><span>تاريخ الطلب</span><b>${esc(created)}</b></div>` : ""}
+      <div class="stack">${url && st === "DONE" ? `<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">🚀 فتح النظام</a>` : ""}
+        <button class="btn g" type="button" id="toInq">💬 إرسال استفسار أو شكوى</button>
+        <a class="btn wa" href="${waHref}" target="_blank" rel="noopener"><svg class="i f"><use href="#i-wa"/></svg>تواصل واتساب</a></div></div></div>`;
+    $("toInq").onclick = () => { resetInq(); $("iNum").value = d.requestNumber; $("iPhone").value = $("tPhone").value; go("inquiry"); };
+    setTimeout(() => $("trackRes").scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  } catch (x) { console.error(x); err.innerHTML = "حصل خطأ أثناء البحث، حاول تاني" + WA_LINK; }
+  finally { $("act").disabled = false; $("act").textContent = BAR.track[0]; }
+}
+
+// ---------- استفسار / شكوى ----------
+let kind = "INQUIRY";
+$$("#kindSeg button").forEach(b => b.onclick = () => { kind = b.dataset.k; $$("#kindSeg button").forEach(x => x.classList.toggle("on", x === b)); });
+async function sendInquiry() {
+  const err = $("err"); err.textContent = "";
+  if ($("iWeb").value) { $("inqForm").classList.add("hide"); $("okInq").classList.remove("hide"); $("bar").classList.add("hide"); return; }
+  const name = $("iName").value.trim(), pd = digits($("iPhone").value), msg = $("iMsg").value.trim(), nd = digits($("iNum").value);
+  if (name.length < 2 || !pd || msg.length < 3) { err.textContent = "من فضلك اكتب الاسم ورقم الهاتف والرسالة."; return; }
+  if (pd.length < 10 || pd.length > 15) { err.textContent = "رقم الهاتف غير صحيح (10 أرقام على الأقل)."; return; }
+  $("act").disabled = true; $("act").textContent = "جارٍ الإرسال...";
+  try {
+    const rlKey = "inq-" + pd.slice(-10), b = writeBatch(db);
+    b.set(doc(db, "rateLimits", rlKey), { lastAt: serverTimestamp() });
+    b.set(doc(collection(db, COL.inquiries)), { fullName: name, phone: toLatin($("iPhone").value.trim()), kind, requestNumber: nd ? "XR-" + nd.padStart(6, "0").slice(-6) : "", message: msg, status: "NEW", rlKey, createdAt: serverTimestamp() });
+    await b.commit();
+    $("inqForm").classList.add("hide"); $("okInq").classList.remove("hide"); $("bar").classList.add("hide"); $("main").scrollTo(0, 0);
+  } catch (x) {
+    console.error(x);
+    err.innerHTML = (x.code === "permission-denied" ? "لقد أرسلت رسالة منذ قليل، يمكنك إرسال رسالة جديدة بعد ١٠ دقائق" : "حصل خطأ أثناء الإرسال، حاول تاني") + WA_LINK;
+    $("act").disabled = false; $("act").textContent = BAR.inquiry[0];
+  }
+}
+route();
 </script>
 </body>
 </html>
