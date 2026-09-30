@@ -1,12 +1,16 @@
 import { db, COL } from "./firebase.js";
-import { addDoc, collection, serverTimestamp, getDocs, query, orderBy, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { addDoc, collection, serverTimestamp, getDocs, query, orderBy, getDoc, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 export const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 export const STATUS_AR = { NEW:"طلب جديد", EXECUTION:"التنفيذ", ACTIVE:"مشروع نشط", CANCELLED:"ملغي" };
 export const PLAN_AR = { TRIAL:"تجربة مجانية", START:"Start", PRO:"Pro", BUSINESS:"Business", CUSTOM:"Custom" };
 export const toDate = t => t?.toDate ? t.toDate() : (t ? new Date(t) : null);
 export const fmtDate = t => { const d = toDate(t); return d ? d.toLocaleDateString("en-GB") : "—"; };
 export const fmtDT = t => { const d = toDate(t); return d ? d.toLocaleDateString("en-GB") + " " + d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"}) : "—"; };
-export const waLink = (p, text) => { let d = String(p||"").replace(/\D/g,""); if (d.startsWith("00")) d = d.slice(2); else if (d.startsWith("0")) d = "20" + d.slice(1); return "https://wa.me/" + d + (text ? "?text=" + encodeURIComponent(text) : ""); };
+// أرقام: تحويل الأرقام العربية/الفارسية إلى لاتينية وتوحيد الصيغة الدولية (مصر 20)
+export const digits = s => String(s ?? "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g, "");
+export const intlPhone = p => { let d = digits(p); if (d.startsWith("00")) d = d.slice(2); else if (d.startsWith("0")) d = "20" + d.slice(1); else if (d.length === 10 && d.startsWith("1")) d = "20" + d; return d; };
+export const waLink = (p, text) => "https://api.whatsapp.com/send?phone=" + intlPhone(p) + (text ? "&text=" + encodeURIComponent(text) : "");
+export const telLink = p => "tel:+" + intlPhone(p);
 export const toast = m => { const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.append(t); setTimeout(() => t.remove(), 2500); };
 
 // سجل العمليات + الإشعارات (نقطة واحدة لإعادة الاستخدام)
@@ -37,7 +41,11 @@ export async function timelineHtml(customerId) {
 
 export const BUSINESS_TYPES = ["محل تجاري","بيع بالتقسيط","عيادة","مركز طبي","مكتب محاماة","مخزن","شركة","مكتب إداري","مطعم / كافيه","نشاط آخر"];
 // أزرار اتصال + واتساب تظهر على كل بطاقة عميل (لا تفتح البطاقة عند الضغط)
-export const contactBtns = (phone, wa) => (phone || wa) ? `<div class="qc" onclick="event.stopPropagation()"><a class="qb" href="tel:${esc(phone || wa)}" aria-label="اتصال">📞</a><a class="qb wa" href="${waLink(wa || phone)}" target="_blank" rel="noopener" aria-label="واتساب">💬</a></div>` : "";
+export const contactBtns = (phone, wa) => (phone || wa) ? `<div class="qc" onclick="event.stopPropagation()"><a class="qb" href="${telLink(phone || wa)}" aria-label="اتصال">📞</a><a class="qb wa" href="${waLink(wa || phone)}" target="_blank" rel="noopener" aria-label="واتساب">💬</a></div>` : "";
+// صف أزرار كامل داخل النوافذ: اتصال + واتساب + نسخ الرقم (احتياطي لو الجهاز لا يفتح الروابط)
+export const callActs = (phone, wa) => `<div class="acts"><a class="btn" href="${telLink(phone || wa)}">📞 اتصال</a><a class="btn wa" target="_blank" rel="noopener" href="${waLink(wa || phone)}">💬 واتساب</a><button type="button" class="btn g" data-copy="${esc(digits(phone || wa))}">📋 نسخ الرقم</button></div>`;
+document.addEventListener("click", e => { const b = e.target.closest?.("[data-copy]"); if (!b) return; const t = b.dataset.copy;
+  (navigator.clipboard?.writeText(t) || Promise.reject()).then(() => toast("تم نسخ الرقم"), () => { const i = document.createElement("textarea"); i.value = t; document.body.append(i); i.select(); try { document.execCommand("copy"); toast("تم نسخ الرقم"); } catch {} i.remove(); }); });
 // شريط فلاتر قابل للطي: defs = [{id,label,options:[[value,label]]}] + فلتر تاريخ من/إلى
 export function mkFilters(host, defs, cb) {
   host.innerHTML = `<details class="flt"><summary>🔎 فلاتر</summary><div class="two">${defs.map(d => `<label>${d.label}<select data-f="${d.id}"><option value="">الكل</option>${d.options.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("")}</select></label>`).join("")}<label>من<input type="date" data-f="from"></label><label>إلى<input type="date" data-f="to"></label></div></details>`;
@@ -74,4 +82,35 @@ export function receiptModal(rc, cust) {
   const { m } = modal(`<h3>تم تسجيل الدفعة ✅</h3><p>رقم الإيصال: <b>${esc(rc.receiptNumber)}</b></p><div class="acts"><a class="btn" target="_blank" rel="noopener" href="${link}">🧾 فتح الإيصال / طباعة</a></div>
     ${waBox(cust.whatsapp || cust.phone, { name: cust.fullName || "", amount: rc.amountText, no: rc.receiptNumber, link }, ["receipt"])}`);
   bindWa(m);
+}
+
+// ---------- التواصل مع العميل (الكول سنتر) ----------
+export const CONTACT_TYPE = { CALL: "📞 اتصال", WHATSAPP: "💬 واتساب" };
+export const OUTCOME = { ANSWERED: "تم الرد", NO_ANSWER: "لم يرد", CLOSED: "الهاتف مغلق", BUSY: "الرقم مشغول", WRONG: "رقم خاطئ / غير متاح", POSTPONED: "العميل طلب موعدًا آخر", NOT_INTERESTED: "غير مهتم" };
+export const OUTCOME_CB = [ "POSTPONED", "NO_ANSWER", "CLOSED", "BUSY" ];   // نتائج يظهر معها تحديد موعد إعادة الاتصال
+export const cbToDate = (dateStr, hour12, ap) => { if (!dateStr) return null; const h = (+hour12 % 12) + (ap === "PM" ? 12 : 0); return new Date(`${dateStr}T${String(h).padStart(2, "0")}:00:00`); };
+export const cbParts = t => { const d = toDate(t); if (!d) return { date: "", hour: 10, ap: "AM" }; const h = d.getHours(); return { date: inputDate(d), hour: ((h + 11) % 12) + 1, ap: h >= 12 ? "PM" : "AM" }; };
+export const cbText = t => { const d = toDate(t); if (!d) return ""; const h = d.getHours(); return d.toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long" }) + " — الساعة " + (((h + 11) % 12) + 1) + (h >= 12 ? " مساءً" : " صباحًا"); };
+
+// ---------- صفحة استعلام العميل (لقطة عامة بدون بيانات حساسة) ----------
+// المعرّف = رقم الطلب + آخر 10 أرقام من الهاتف، فلا يمكن تخمينه من رقم الطلب وحده.
+export const pubIdOf = (num, phone) => num + "-" + digits(phone).slice(-10);
+export const stageOf = r => r.status === "CANCELLED" ? "CANCELLED" : r.status === "ACTIVE" ? "DONE" : r.status === "EXECUTION" ? "CONFIRMED" : (r.contactLog?.length ? "CONTACTED" : "RECEIVED");
+export async function syncPublic(r, c) {
+  const id = pubIdOf(r.requestNumber, c.phone), cb = toDate(r.callbackAt);
+  await setDoc(doc(db, COL.publicStatus, id), { requestId: r.id, requestNumber: r.requestNumber, plan: r.selectedPlan || "", stage: stageOf(r),
+    clientNote: r.clientNote || "", callbackText: r.status === "NEW" && cb && cb > new Date() ? cbText(cb) : "",
+    systemUrl: r.status === "ACTIVE" ? (r.execution?.systemUrl || "") : "", createdAt: r.createdAt || serverTimestamp(), updatedAt: serverTimestamp() });
+  if (r.publicId && r.publicId !== id) { try { await deleteDoc(doc(db, COL.publicStatus, r.publicId)); } catch {} }   // تغيّر رقم الهاتف
+  return id;
+}
+
+// ---------- رسائل واتساب بعد الحالات الرئيسية (تُفتح جاهزة والموظف يضغط إرسال) ----------
+export const msgConfirmed = (name, ref) => `مرحبًا ${name} 🌟\nتم تأكيد طلبك رقم ${ref} ✅\nوجارٍ الآن تصميم نظام العمل الذي يتوافق مع متطلبات عملك.\nيسعدنا ويشرفنا التعامل مع حضرتك.\n— فريق XERIA`;
+export const msgDone = (name, ref, url, user, pass) => `مرحبًا ${name} 🎉\nتم تنفيذ طلبك رقم ${ref} وأصبح نظامك جاهزًا ✅\n\n🔗 رابط النظام:\n${url}\n` + (user || pass ? `\n🔐 بيانات الدخول:\n${user ? "اسم المستخدم: " + user + "\n" : ""}${pass ? "كلمة المرور: " + pass + "\n" : ""}` : "") + `\nنتمنى لك تجربة موفقة، ولأي استفسار نحن في خدمتك.\n— فريق XERIA`;
+// نافذة نجاح تعرض زر إرسال واتساب جاهز
+export function waPrompt(title, phone, text) {
+  const { m } = modal(`<h3>${esc(title)}</h3><p class="mut">اضغط الزر لفتح واتساب برسالة جاهزة، ثم اضغط إرسال.</p><pre class="need" style="font-family:inherit">${esc(text)}</pre>
+    <div class="acts"><a class="btn wa" target="_blank" rel="noopener" href="${waLink(phone, text)}">💬 إرسال على واتساب</a><button type="button" class="btn g" data-copy="${esc(text)}">📋 نسخ الرسالة</button></div>`);
+  return m;
 }

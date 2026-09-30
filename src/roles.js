@@ -7,6 +7,7 @@ export const PAGE_ACCESS = {
   requests:   ["admin", "manager", "callcenter"],
   execution:  ["admin", "manager", "execution"],
   customers:  ["admin", "manager", "callcenter", "accounts"],
+  inquiries:  ["admin", "manager", "callcenter"],
   projects:   ["admin", "manager", "execution", "accounts"],
   accounts:   ["admin", "manager", "accounts"],
   renewals:   ["admin", "manager", "accounts"],

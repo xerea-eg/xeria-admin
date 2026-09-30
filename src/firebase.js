@@ -30,5 +30,6 @@ export const storage = getStorage(app);
 export const COL = {
   employees: "employees", customers: "customers", requests: "requests",
   projects: "projects", payments: "payments", subscriptions: "subscriptions",
-  notifications: "notifications", activityLogs: "activityLogs", settings: "settings"
+  notifications: "notifications", activityLogs: "activityLogs", settings: "settings",
+  publicStatus: "publicStatus", inquiries: "inquiries"
 };

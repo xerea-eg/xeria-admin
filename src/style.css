@@ -52,3 +52,9 @@ a,button{-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}
 }
 .warn{background:#f5a62433;border:1px solid #f5a62477;padding:10px;border-radius:10px;font-size:14px}.wabox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.wabox select{flex:1;min-width:140px}.wabox .btn{width:auto;flex:none}
 #nav a{position:relative}.nb{position:absolute;top:2px;inset-inline-end:6px;min-width:18px;height:18px;border-radius:9px;background:#ff5c7a;color:#fff;font-size:11px;display:grid;place-items:center;padding:0 4px}
+
+/* الكول سنتر: صناديق الأقسام + حقول الموعد */
+.cbox{border:1px solid #ffffff22;border-radius:14px;padding:12px;display:grid;gap:10px}.cbox h4{margin:0;font-size:15px}
+:root[data-theme=light] .cbox{border-color:#0a103022}
+.three{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:8px}
+.acts a.btn,.acts button.btn{min-height:44px;display:flex;align-items:center;justify-content:center}

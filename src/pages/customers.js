@@ -2,7 +2,7 @@ import { SUB_AR, subStatus, METHOD_AR, money } from "../finance.js";
 import { db, COL } from "../firebase.js";
 import { collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { findPortal, createPortal, buildPortal, revokePortal } from "../portal.js";
-import { logActivity, toast, appBase, waBox, bindWa, exportXls, PLAN_AR, contactBtns, esc, fmtDate, waLink, modal, timelineHtml, PROJECT_AR, USAGE_AR } from "../util.js";
+import { logActivity, toast, appBase, waBox, bindWa, exportXls, PLAN_AR, contactBtns, callActs, esc, fmtDate, waLink, modal, timelineHtml, PROJECT_AR, USAGE_AR } from "../util.js";
 export async function render(el, emp) {
   el.innerHTML = `<h2>العملاء <button class="btn g" id="xl" style="width:auto;padding:4px 12px">📊 Excel</button></h2><input id="q" class="search" placeholder="بحث بالاسم أو الهاتف أو النشاط"><div id="list" class="list"><p class="mut">جارٍ التحميل...</p></div>`;
   const rows = (await getDocs(query(collection(db, COL.customers), limit(200)))).docs.map(d => ({ ...d.data(), id: d.id }))
@@ -19,7 +19,7 @@ async function open(c, emp) {
   const { m } = modal(`<h3>${esc(c.fullName)}</h3>${c.logoUrl ? `<img class="logo" src="${esc(c.logoUrl)}" alt="">` : ""}
    <div class="kv"><b>النشاط</b><span>${esc(c.businessName)} (${esc(c.businessType)})</span><b>الهاتف</b><span>${esc(c.phone)}</span><b>واتساب</b><span>${esc(c.whatsapp || "—")}</span>
    <b>الموقع</b><span>${esc(c.governorate || "—")} / ${esc(c.city || "—")}</span><b>تاريخ التسجيل</b><span>${fmtDate(c.createdAt)}</span></div>
-   <div class="acts"><a class="btn" href="tel:${esc(c.phone)}">📞 اتصال</a><a class="btn wa" target="_blank" rel="noopener" href="${waLink(c.whatsapp || c.phone)}">WhatsApp</a></div>
+   ${callActs(c.phone, c.whatsapp)}
    <div id="pt"></div><h4>المشاريع</h4><div id="pj" class="mut">...</div><h4>الاشتراكات</h4><div id="sb" class="mut">...</div><h4>المدفوعات</h4><div id="py" class="mut">...</div><h4>Timeline</h4><div id="tl" class="mut">...</div>`);
   if (["admin", "manager", "accounts"].includes(emp?.role)) portalSection(m, c, emp);
   try { const p = await getDocs(query(collection(db, COL.projects), where("customerId", "==", c.id)));

@@ -1,7 +1,7 @@
 import { logout } from "./auth.js";
 import { PAGE_ACCESS, ROLE_AR, can } from "./roles.js";
-const NAV = { dashboard:["الرئيسية","📊"], requests:["الطلبات","📥"], execution:["التنفيذ","🛠️"], customers:["العملاء","👥"], projects:["المشاريع","🚀"], accounts:["الحسابات","💰"], renewals:["التجديدات","🔄"], reports:["التقارير","📈"], employees:["الموظفون","🧑‍💼"], activity:["السجل","🧾"], settings:["الإعدادات","⚙️"] };
-const LOADERS = { dashboard: () => import("./pages/dashboard.js"), requests: () => import("./pages/requests.js"), execution: () => import("./pages/execution.js"), customers: () => import("./pages/customers.js"), projects: () => import("./pages/projects.js"), accounts: () => import("./pages/accounts.js"), renewals: () => import("./pages/renewals.js"), reports: () => import("./pages/reports.js"), activity: () => import("./pages/activity.js"), settings: () => import("./pages/settings.js"), employees: () => import("./pages/employees.js") };
+const NAV = { dashboard:["الرئيسية","📊"], requests:["الطلبات","📥"], execution:["التنفيذ","🛠️"], customers:["العملاء","👥"], inquiries:["الاستفسارات","💬"], projects:["المشاريع","🚀"], accounts:["الحسابات","💰"], renewals:["التجديدات","🔄"], reports:["التقارير","📈"], employees:["الموظفون","🧑‍💼"], activity:["السجل","🧾"], settings:["الإعدادات","⚙️"] };
+const LOADERS = { dashboard: () => import("./pages/dashboard.js"), requests: () => import("./pages/requests.js"), execution: () => import("./pages/execution.js"), customers: () => import("./pages/customers.js"), inquiries: () => import("./pages/inquiries.js"), projects: () => import("./pages/projects.js"), accounts: () => import("./pages/accounts.js"), renewals: () => import("./pages/renewals.js"), reports: () => import("./pages/reports.js"), activity: () => import("./pages/activity.js"), settings: () => import("./pages/settings.js"), employees: () => import("./pages/employees.js") };
 let emp;
 export function startApp(employee) {
   emp = employee;

@@ -1,7 +1,7 @@
 import { db, COL } from "../firebase.js";
 import { collection, query, where, limit, getDocs, getDoc, doc, updateDoc, runTransaction, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { mountSysFiles } from "./sysfiles.js";
-import { getCustomer, memo, contactBtns, esc, PLAN_AR, fmtDate, waLink, toast, logActivity, notify, addTimeline, SYSTEM_TYPES, modal, addDays, addMonths, inputDate } from "../util.js";
+import { getCustomer, memo, contactBtns, callActs, syncPublic, pubIdOf, msgDone, waPrompt, esc, PLAN_AR, fmtDate, toast, logActivity, notify, addTimeline, SYSTEM_TYPES, modal, addDays, addMonths, inputDate } from "../util.js";
 let emp, host;
 export async function render(el, employee) {
   emp = employee; host = el;
@@ -21,7 +21,7 @@ async function open(r) {
    <div class="kv"><b>العميل</b><span>${esc(c.fullName)}</span><b>الهاتف</b><span>${esc(c.phone)}</span><b>الباقة</b><span>${PLAN_AR[r.selectedPlan] || ""}</span></div>
    <p class="need">${esc(r.description || "لا يوجد وصف")}</p>
    <p class="need">ملاحظات Call Center: ${esc(r.callCenterNotes || "—")}</p>
-   <div class="acts"><a class="btn" href="tel:${esc(c.phone)}">📞 اتصال</a><a class="btn wa" target="_blank" rel="noopener" href="${waLink(c.whatsapp || c.phone)}">WhatsApp</a></div>
+   ${callActs(c.phone, c.whatsapp)}
    <div class="imgs">${c.logoUrl ? `<img src="${esc(c.logoUrl)}" alt="">` : ""}</div>
    ${r.audioUrl ? `<audio controls src="${esc(r.audioUrl)}" style="width:100%"></audio>` : ""}
    <div class="two"><label>نوع النظام<select id="st">${SYSTEM_TYPES.map(t => `<option ${x.systemType === t ? "selected" : ""}>${t}</option>`).join("")}</select></label>
@@ -30,6 +30,7 @@ async function open(r) {
    <label>تاريخ بداية الاستخدام<input id="sd" type="date" value="${x.startDate || inputDate(new Date())}"></label></div>
    <label>رابط النظام (System URL)<input id="su" type="url" dir="ltr" value="${esc(x.systemUrl || "")}"></label>
    <label>الدومين (إن وجد)<input id="dm" dir="ltr" value="${esc(x.domainName || "")}"></label>
+   <div class="cbox"><h4>🔐 بيانات دخول العميل (للرسالة فقط — لا تُحفظ في النظام)</h4><div class="two"><label>اسم المستخدم<input id="lu" dir="ltr" autocomplete="off"></label><label>كلمة المرور<input id="lp" dir="ltr" autocomplete="off"></label></div></div>
    <div id="sf"></div>
    <label>ملاحظات التنفيذ<textarea id="nt" rows="3">${esc(x.notes || "")}</textarea></label>
    <label>موظف التنفيذ المسؤول<select id="as">${list.map(s => `<option value="${esc(s.uid)}" ${s.uid === cur ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
@@ -60,13 +61,15 @@ async function open(r) {
           usageType: trial ? "TRIAL" : "PAID", systemUrl: d.systemUrl, hasCustomDomain: !!d.domainName, domainName: d.domainName,
           assignedExecutionEmployeeId: d.assignedId, assignedExecutionEmployeeName: d.assignedName, executionNotes: d.notes,
           startDate: Timestamp.fromDate(start), endDate: Timestamp.fromDate(end), status: "ACTIVE", createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-        tx.update(doc(db, COL.requests, r.id), { status: "ACTIVE", projectId: pRef.id, execution: d, updatedAt: serverTimestamp() });
+        tx.update(doc(db, COL.requests, r.id), { status: "ACTIVE", projectId: pRef.id, execution: d, publicId: pubIdOf(r.requestNumber, r.c.phone), updatedAt: serverTimestamp() });
         return n;
       });
       await logActivity(emp, "CREATE_PROJECT", "project", pRef.id, null, { projectNumber: num, requestId: r.id });
       await addTimeline(emp, r.customerId, "PROJECT_CREATED", `تم إنشاء المشروع ${num} وإضافة رابط النظام`, pRef.id);
       await notify("PROJECT_CREATED", `تم إنشاء المشروع ${num} — ${r.c.businessName}`, "project", pRef.id);
+      try { await syncPublic({ ...r, status: "ACTIVE", execution: d }, r.c); } catch (e) { console.warn(e); toast("تم الإنشاء، لكن تعذّر تحديث صفحة استعلام العميل"); }
       toast("تم إنشاء المشروع " + num); close(); render(host, emp);
+      waPrompt("🎉 تم التنفيذ — أرسل الرابط وبيانات الدخول للعميل", r.c.whatsapp || r.c.phone, msgDone(r.c.fullName, r.requestNumber, d.systemUrl, $("#lu").value.trim(), $("#lp").value.trim()));
     } catch (e) { console.error(e); toast("حدث خطأ أثناء إنشاء المشروع"); }
   };
 }
