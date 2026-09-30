@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XERIA Admin</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0a1030"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="./src/style.css">
+<style>
+:root{--bg:#0a1030;--card:#131a45;--text:#fff;--mut:#9aa4d6;--a1:#7c3aed;--a2:#2f6bff;--err:#ff5c7a}
+:root[data-theme=light]{--bg:#f3f5fc;--card:#fff;--text:#0a1030;--mut:#5b6494}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hide{display:none!important}
+.center{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{background:var(--card);border-radius:18px;padding:28px;width:100%;max-width:380px;box-shadow:0 10px 40px #0004}
+h1{margin:0;font-size:28px;letter-spacing:2px;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;color:transparent}
+.tag{color:var(--mut);margin:4px 0 20px;font-size:14px}
+input{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid #ffffff22;background:transparent;color:var(--text);font-size:16px}
+button{width:100%;padding:13px;margin-top:10px;border:0;border-radius:10px;color:#fff;font-size:16px;cursor:pointer;background:linear-gradient(90deg,var(--a1),var(--a2))}
+.err{color:var(--err);font-size:14px;min-height:20px;margin-top:8px}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--card)}
+main{padding:18px}
+</style>
+</head>
+<body>
+<div id="loginView" class="center">
+  <div class="card">
+    <h1>XERIA</h1><div class="tag">نظم أعمالك ببساطة</div>
+    <input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
+    <input id="pass" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+    <button id="loginBtn">تسجيل الدخول</button>
+    <div id="err" class="err"></div>
+  </div>
+</div>
+
+<div id="appView" class="hide">
+  <header><strong class="brand-h">XERIA Admin</strong>
+    <div class="hr"><span id="clock"></span><button class="ib" id="bell" title="الإشعارات">🔔</button><button class="ib" id="searchBtn">🔍</button><button class="ib hm" id="themeBtn">🌓</button>
+    <span id="who" class="hm"></span><div id="avatar"></div><button class="ib hm" id="logoutBtn">خروج</button></div></header>
+  <nav id="nav"></nav><main id="page"></main>
+</div>
+
+<script type="module">
+import { watchSession, login } from "./src/auth.js";
+import { startApp } from "./src/app.js";
+const $ = id => document.getElementById(id);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+document.documentElement.dataset.theme = localStorage.getItem("theme") || "dark";
+watchSession((emp, why) => {
+  $("loginView").classList.toggle("hide", !!emp);
+  $("appView").classList.toggle("hide", !emp);
+  if (why === "denied") $("err").textContent = "هذا الحساب غير مفعّل أو غير مسجل كموظف.";
+  if (emp) startApp(emp); else import("./src/live.js").then(x => x.stopLive());
+});
+$("loginBtn").onclick = async () => {
+  $("err").textContent = "";
+  try { await login($("email").value.trim(), $("pass").value); }
+  catch { $("err").textContent = "بيانات الدخول غير صحيحة."; }
+};
+</script>
+</body>
+</html>

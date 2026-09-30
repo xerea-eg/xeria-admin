@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>إيصال دفع — XERIA</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef1fa;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;padding:16px;color:#111}
+.r{max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:26px 22px;position:relative;overflow:hidden;box-shadow:0 8px 30px #0a103022}
+.h{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #7c3aed;padding-bottom:12px;margin-bottom:14px}
+.brand{font-weight:800;letter-spacing:3px;font-size:22px;color:#2f2fbf}.no{font-size:13px;color:#555;text-align:left}
+.amt{text-align:center;font-size:32px;font-weight:800;margin:16px 0;color:#0a1030}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px}.kv b{color:#666;font-weight:600}
+.f{margin-top:20px;font-size:12px;color:#777;text-align:center;border-top:1px dashed #ccc;padding-top:12px}
+.void{position:absolute;inset:0;display:grid;place-items:center;font-size:64px;font-weight:900;color:#c0264a44;transform:rotate(-18deg);pointer-events:none}
+button{display:block;margin:16px auto 0;padding:12px 22px;border:0;border-radius:10px;background:linear-gradient(90deg,#7c3aed,#2f6bff);color:#fff;font-size:16px;cursor:pointer;font-family:inherit}
+@media print{body{background:#fff;padding:0}.r{box-shadow:none}button{display:none}}
+</style></head>
+<body><div id="app" class="r">جارٍ التحميل...</div><button id="pr" style="display:none" onclick="print()">🖨️ طباعة / حفظ PDF</button>
+<script type="module">
+import { db } from "./src/firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const M = { Cash: "نقدي", InstaPay: "إنستا باي", "Bank Transfer": "تحويل بنكي", Wallet: "محفظة", Other: "أخرى" };
+const id = new URLSearchParams(location.search).get("id"), app = document.getElementById("app");
+try {
+  if (!/^[A-Za-z0-9]{10,40}$/.test(id || "")) throw 0;
+  const s = await getDoc(doc(db, "receipts", id)); if (!s.exists()) throw 0; const r = s.data(), co = r.company || {};
+  document.title = "إيصال " + r.receiptNumber;
+  app.innerHTML = `${r.void ? `<div class="void">ملغي</div>` : ""}<div class="h"><div class="brand">${esc(co.name || "XERIA")}</div><div class="no">إيصال دفع<br><b>${esc(r.receiptNumber)}</b></div></div>
+   <div class="amt">${Number(r.amount).toLocaleString("ar-EG")} جنيه</div>
+   <div class="kv"><b>استلمنا من</b><span>${esc(r.customerName)}</span><b>النشاط</b><span>${esc(r.businessName)}</span><b>المشروع</b><span>${esc(r.projectNumber)}</span>
+   <b>التاريخ</b><span>${new Date(r.paymentDate.seconds * 1000).toLocaleDateString("ar-EG")}</span><b>طريقة الدفع</b><span>${esc(M[r.paymentMethod] || r.paymentMethod)}</span>
+   ${r.transactionNumber ? `<b>رقم العملية</b><span dir="ltr">${esc(r.transactionNumber)}</span>` : ""}${r.notes ? `<b>ملاحظات</b><span>${esc(r.notes)}</span>` : ""}<b>استلمها</b><span>${esc(r.receivedBy)}</span></div>
+   <div class="f">${esc(co.name || "XERIA")} — نظم أعمالك ببساطة${co.phone ? " · " + esc(co.phone) : ""}${r.void ? `<br>هذا الإيصال ملغي${r.voidReason ? ": " + esc(r.voidReason) : ""}` : ""}</div>`;
+  document.getElementById("pr").style.display = "block";
+} catch { app.textContent = "الإيصال غير موجود أو الرابط غير صحيح."; }
+</script></body></html>

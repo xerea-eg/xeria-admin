@@ -1,0 +1,137 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function emp() { return get(/databases/$(database)/documents/employees/$(request.auth.uid)).data; }
+    function isStaff() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/employees/$(request.auth.uid))
+        && emp().isActive == true;
+    }
+    function role() { return emp().role; }
+    function hasRole(list) { return isStaff() && role() in list; }
+    function isAdmin() { return hasRole(['admin']); }
+
+    // الموظفون: قراءة الذات أو الأدمن/المدير، والكتابة للأدمن فقط
+    match /employees/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || hasRole(['admin','manager']));
+      allow create, update, delete: if isAdmin();
+    }
+
+    // العملاء: إنشاء عام محدود من النموذج، والباقي حسب الدور
+    match /customers/{id} {
+      allow create: if request.resource.data.keys().hasOnly(
+          ['fullName','phone','whatsapp','businessName','businessType','governorate','city',
+           'branchesCount','expectedUsers','logoUrl','createdAt','updatedAt'])
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() > 1 && request.resource.data.fullName.size() < 120
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 8 && request.resource.data.phone.size() < 20
+        && request.resource.data.businessName is string && request.resource.data.businessName.size() > 0;
+      allow read: if hasRole(['admin','manager','callcenter','execution','accounts']);
+      allow update: if hasRole(['admin','callcenter']);
+      allow delete: if isAdmin();
+
+      // Timeline الموحد للعميل: إضافة وقراءة للموظفين، بدون تعديل أو حذف
+      match /timeline/{eid} {
+        allow read: if isStaff();
+        allow create: if isStaff() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    // الطلبات: العميل يُنشئ بحالة NEW فقط ولا يقرأ شيئاً
+    match /requests/{id} {
+      allow create: if request.resource.data.status == 'NEW'
+        && request.resource.data.customerId is string
+        && request.resource.data.selectedPlan in ['TRIAL','START','PRO','BUSINESS','CUSTOM']
+        && !('callCenterNotes' in request.resource.data.keys())
+        && request.resource.data.phoneKey is string
+        && getAfter(/databases/$(database)/documents/rateLimits/$(request.resource.data.phoneKey)).data.lastAt == request.time;
+      allow read: if hasRole(['admin','manager','callcenter','execution']);
+      allow update: if hasRole(['admin','callcenter','execution']);
+      allow delete: if isAdmin();
+
+      // بيانات النظام الحساسة (إعدادات Firebase + قائمة الملفات): أدمن وتنفيذ فقط
+      match /private/{doc} {
+        allow read, write: if hasRole(['admin','execution']);
+      }
+    }
+
+    // حد الإرسال: طلب واحد لكل رقم هاتف كل 10 دقائق
+    match /rateLimits/{k} {
+      allow create: if request.resource.data.keys().hasOnly(['lastAt']) && request.resource.data.lastAt == request.time;
+      allow update: if request.resource.data.keys().hasOnly(['lastAt']) && request.resource.data.lastAt == request.time
+                    && request.time > resource.data.lastAt + duration.value(10, 'm');
+      allow read: if isAdmin();
+    }
+
+    // الإيصال الإلكتروني: قراءة بالرابط فقط (ID عشوائي)، لا يمكن سرد الإيصالات
+    match /receipts/{id} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if hasRole(['admin','accounts']);
+      allow update: if hasRole(['admin','accounts']) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['void','voidReason']);
+      allow delete: if false;
+    }
+
+    // بوابة العميل: لقطة بيانات منشورة يدويًا، تُقرأ بالتوكن فقط
+    match /portal/{token} {
+      allow get: if true;
+      allow list, create, update, delete: if hasRole(['admin','manager','accounts']);
+    }
+
+    match /projects/{id} {
+      allow read: if hasRole(['admin','manager','execution','accounts']);
+      allow create: if hasRole(['admin','execution']);
+      allow update: if hasRole(['admin','execution'])
+        || (hasRole(['accounts']) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+             ['billing','paidTotal','plan','billingCycle','usageType','startDate','endDate','status','domainExpiryDate','domainStatus','domainRenewalPrice','domainPrice','domainPurchaseDate','updatedAt']));
+      allow delete: if isAdmin();
+    }
+
+    match /payments/{id} {
+      allow read: if hasRole(['admin','manager','accounts']);
+      allow create: if hasRole(['admin','accounts']);
+      // حذف ناعم فقط: لا حذف نهائي ولا تعديل للمبلغ
+      allow update: if hasRole(['admin','accounts']) && request.resource.data.amount == resource.data.amount;
+      allow delete: if false;
+    }
+
+    match /subscriptions/{id} {
+      allow read: if hasRole(['admin','manager','accounts']);
+      allow write: if hasRole(['admin','accounts']);
+    }
+
+    match /notifications/{id} {
+      allow read, update: if isStaff();
+      allow create: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // سجل العمليات: إضافة فقط، لا تعديل ولا حذف
+    match /activityLogs/{id} {
+      allow read: if hasRole(['admin','manager']);
+      allow create: if isStaff() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // الإعدادات: الباقات والأسعار قراءة عامة (للصفحة العامة)، الكتابة للأدمن
+    // عدّاد أرقام الطلبات: زيادة واحدة فقط من الصفحة العامة
+    match /settings/counters {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['requestSeq']) && request.resource.data.requestSeq == 1;
+      allow update: if (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['requestSeq'])
+                         && request.resource.data.requestSeq == resource.data.get('requestSeq', 0) + 1)
+                    || (isStaff() && (
+                         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['projectSeq'])
+                           && request.resource.data.projectSeq == resource.data.get('projectSeq', 0) + 1)
+                      || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['receiptSeq'])
+                           && request.resource.data.receiptSeq == resource.data.get('receiptSeq', 0) + 1)));
+    }
+
+    match /settings/{id} {
+      allow read: if id == 'plans' || isStaff();
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isStaff() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/employees/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/employees/$(request.auth.uid)).data.isActive == true;
+    }
+    function role() { return firestore.get(/databases/(default)/documents/employees/$(request.auth.uid)).data.role; }
+
+    // رفع عام من نموذج الطلب: صور حتى 5MB وصوت حتى 10MB، بدون قراءة عامة أو سرد
+    match /public-uploads/{file} {
+      allow create: if (request.resource.contentType.matches('image/.*') && request.resource.size < 5 * 1024 * 1024)
+                    || (request.resource.contentType.matches('audio/.*') && request.resource.size < 10 * 1024 * 1024);
+      allow get: if true;
+    }
+
+    // ملفات الكود وإعدادات الأنظمة: أدمن وتنفيذ فقط
+    match /project-files/{rid}/{file} {
+      allow read, delete: if isStaff() && role() in ['admin', 'execution'];
+      allow create, update: if isStaff() && role() in ['admin', 'execution'] && request.resource.size < 25 * 1024 * 1024;
+    }
+
+    // مرفقات إيصالات الدفع
+    match /receipts/{pid}/{file} {
+      allow read: if isStaff();
+      allow create: if isStaff() && (request.resource.contentType.matches('image/.*') || request.resource.contentType == 'application/pdf') && request.resource.size < 5 * 1024 * 1024;
+    }
+  }
+}

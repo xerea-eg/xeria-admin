@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>متابعة اشتراكك — XERIA</title>
+<style>
+:root{--bg:#0a1030;--card:#131a45;--t:#fff;--m:#9aa4d6;--a1:#7c3aed;--a2:#2f6bff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;padding:16px}
+.w{max-width:640px;margin:0 auto}.brand{font-weight:800;letter-spacing:3px;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;color:transparent;font-size:24px}
+h1{font-size:20px;margin:6px 0 16px}h3{margin:20px 0 8px;font-size:16px}.mut{color:var(--m)}
+.c{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;display:grid;gap:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}.kv b{color:var(--m);font-weight:600}
+.pill{font-size:12px;padding:2px 10px;border-radius:20px;background:#ffffff18;display:inline-block}.ok{background:#22c55e55}.warn{background:#f5a62466}.bad{background:#ff5c7a55}
+.btn{display:inline-block;padding:11px 16px;border-radius:10px;color:#fff;text-decoration:none;background:linear-gradient(90deg,var(--a1),var(--a2));font-size:15px}.btn.wa{background:#1fa855}.btn.g{background:#ffffff22}
+.acts{display:flex;gap:8px;flex-wrap:wrap}.row{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--card);border-radius:12px;padding:12px;margin-bottom:8px;font-size:14px}
+a{color:#8fb0ff}
+</style></head>
+<body><div class="w" id="app"><p class="mut">جارٍ التحميل...</p></div>
+<script type="module">
+import { db } from "./src/firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const PL = { TRIAL: "تجربة مجانية", START: "Start", PRO: "Pro", BUSINESS: "Business", CUSTOM: "Custom" }, ST = { ACTIVE: "نشط", EXPIRED: "منتهي", SUSPENDED: "موقوف", CANCELLED: "ملغي" };
+const M = { Cash: "نقدي", InstaPay: "إنستا باي", "Bank Transfer": "تحويل بنكي", Wallet: "محفظة", Other: "أخرى" };
+const money = n => Number(n || 0).toLocaleString("ar-EG") + " جنيه", dt = t => t ? new Date(t).toLocaleDateString("ar-EG") : "—";
+const wa = (p, text) => { let d = String(p || "").replace(/\D/g, ""); if (d.startsWith("00")) d = d.slice(2); else if (d.startsWith("0")) d = "20" + d.slice(1); return "https://wa.me/" + d + "?text=" + encodeURIComponent(text); };
+const t = new URLSearchParams(location.search).get("t"), app = document.getElementById("app");
+try {
+  if (!/^[a-f0-9]{32}$/.test(t || "")) throw 0;
+  const s = await getDoc(doc(db, "portal", t)); if (!s.exists()) throw 0; const d = s.data(), co = d.company || {};
+  const proj = p => { const left = p.endDate ? Math.ceil((p.endDate - Date.now()) / 86400000) : null, rest = Math.max(0, p.total - p.paid);
+    const cls = left === null ? "" : left < 0 ? "bad" : left <= 7 ? "warn" : "ok", txt = left === null ? "" : left < 0 ? "منتهي" : left + " يوم متبقي";
+    return `<div class="c"><div><b>${esc(p.businessName)}</b> <span class="pill">${esc(p.number)}</span> <span class="pill ${p.status === "ACTIVE" ? "ok" : "bad"}">${ST[p.status] || ""}</span></div>
+     <div class="kv"><b>النظام</b><span>${esc(p.systemType)}</span><b>الباقة</b><span>${PL[p.plan] || ""} ${p.usage === "TRIAL" ? "(تجريبي)" : ""}</span>
+     <b>يبدأ</b><span>${dt(p.startDate)}</span><b>ينتهي</b><span>${dt(p.endDate)} <span class="pill ${cls}">${txt}</span></span>
+     ${p.domainName ? `<b>الدومين</b><span dir="ltr">${esc(p.domainName)} (${dt(p.domainExpiry)})</span>` : ""}
+     <b>الإجمالي</b><span>${money(p.total)}</span><b>المدفوع</b><span>${money(p.paid)}</span><b>المتبقي</b><span>${money(rest)}</span></div>
+     <div class="acts">${/^https?:\/\//.test(p.systemUrl) ? `<a class="btn" href="${esc(p.systemUrl)}" target="_blank" rel="noopener">فتح النظام</a>` : ""}
+     ${co.whatsapp ? `<a class="btn wa" target="_blank" rel="noopener" href="${wa(co.whatsapp, `مرحبًا، أرغب في تجديد/ترقية مشروع ${p.number} (${p.businessName})`)}">طلب تجديد / ترقية</a>` : ""}</div></div>`; };
+  app.innerHTML = `<div class="brand">${esc(co.name || "XERIA")}</div><h1>أهلاً ${esc(d.customerName)} 👋</h1>
+   <h3>مشاريعك</h3>${d.projects.map(proj).join("") || `<p class="mut">لا توجد مشاريع بعد.</p>`}
+   <h3>دفعاتك</h3>${d.payments.map(x => `<div class="row"><b>${money(x.amount)}</b><span class="mut">${dt(x.date)} · ${esc(M[x.method] || x.method)}</span>${/^[A-Za-z0-9]{10,40}$/.test(x.receiptId) ? `<a href="receipt.html?id=${x.receiptId}" target="_blank" rel="noopener">🧾 ${esc(x.receiptNumber)}</a>` : ""}</div>`).join("") || `<p class="mut">لا توجد دفعات.</p>`}
+   <h3>تواصل معنا</h3><div class="acts">${co.phone ? `<a class="btn g" href="tel:${esc(co.phone)}">📞 اتصال</a>` : ""}${co.whatsapp ? `<a class="btn wa" target="_blank" rel="noopener" href="${wa(co.whatsapp, "مرحبًا، لدي استفسار")}">WhatsApp</a>` : ""}</div>
+   <p class="mut" style="font-size:12px;margin-top:20px">آخر تحديث: ${d.updatedAt ? new Date(d.updatedAt.seconds * 1000).toLocaleString("ar-EG") : "—"}</p>`;
+} catch { app.innerHTML = `<p class="mut">الرابط غير صحيح أو تم إلغاؤه. تواصل مع فريق XERIA.</p>`; }
+</script></body></html>
