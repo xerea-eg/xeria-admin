@@ -2,100 +2,151 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a1030">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#ffffff">
 <title>اطلب نظامك من XERIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a1030;--card:#131a45;--text:#fff;--mut:#9aa4d6;--a1:#7c3aed;--a2:#2f6bff;--err:#ff5c7a;--line:#ffffff2e}
+:root{--bg:#f3f5fa;--card:#fff;--text:#0f172a;--mut:#64748b;--line:#dfe4ee;--a1:#4f46e5;--a2:#2563eb;--err:#dc2626;--wa:#22c55e}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:560px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom))}
-.brand{letter-spacing:3px;font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;color:transparent}
-h1{font-size:22px;margin:4px 0 4px}
-p.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
-h2.st{font-size:15px;margin:18px 0 8px;color:var(--mut);font-weight:600}
-.toggle{display:flex;gap:4px;background:var(--card);padding:4px;border-radius:12px;margin-bottom:10px}
-.toggle button{flex:1;border:0;background:none;color:var(--mut);padding:10px;border-radius:9px;font-size:15px;font-family:inherit}
-.toggle button.on{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.plan{background:var(--card);border:2px solid transparent;border-radius:14px;padding:14px 8px 10px;text-align:center;position:relative;cursor:pointer}
-.plan.sel{border-color:var(--a2)}
-.plan b{font-size:16px}.plan .pr{font-size:17px;margin-top:6px;font-weight:700}.plan small{color:var(--mut);font-size:12px}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
+body{font-family:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text)}
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:600px;margin:0 auto;background:var(--bg);position:relative}
+
+/* الهيدر ثابت */
+header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;z-index:5}
+.brand{font-weight:800;font-size:22px;letter-spacing:3px;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+.tag{font-size:12px;color:var(--mut);margin-top:2px}
+.wa-h{flex:none;width:44px;height:44px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 4px 12px #22c55e55}
+.wa-h svg{width:26px;height:26px;fill:#fff}
+
+/* المحتوى فقط هو اللي بيتمرر */
+main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px 24px}
+h2.st{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;margin:4px 0 10px}
+h2.st i{font-style:normal;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;font-size:13px;display:grid;place-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 2px #0f172a0a}
+
+.toggle{display:flex;gap:4px;background:#e8ecf5;padding:4px;border-radius:12px;margin-bottom:12px}
+.toggle button{flex:1;border:0;background:none;color:var(--mut);padding:10px;border-radius:9px;font:600 15px "Cairo",inherit;cursor:pointer}
+.toggle button.on{background:var(--card);color:var(--a1);box-shadow:0 1px 4px #0f172a1f}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.plan{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 8px 12px;text-align:center;position:relative;cursor:pointer;transition:.15s}
+.plan.sel{border-color:var(--a2);background:#eff4ff;box-shadow:0 0 0 3px #2563eb22}
+.plan b{font-size:16px}.plan .pr{font-size:17px;margin-top:4px;font-weight:800;color:var(--a1)}.plan small{color:var(--mut);font-size:12px;display:block;min-height:16px}
 .plan:last-child:nth-child(odd){grid-column:1/-1}
-.badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--a1);color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;white-space:nowrap}
-form{background:var(--card);border-radius:18px;padding:16px;display:grid;gap:14px}
-label{font-size:14px;color:var(--mut);display:grid;gap:6px}
-input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:16px;font-family:inherit}
-select option{color:#000}
-textarea{resize:vertical;min-height:110px}
-.btn{border:0;border-radius:12px;padding:12px 16px;color:#fff;background:linear-gradient(90deg,var(--a1),var(--a2));font-size:15px;font-family:inherit;cursor:pointer}
-.btn.g{background:#ffffff1f}
-.mic{width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
-.mic.on{background:#c0264a;animation:pulse 1.2s infinite}
-@keyframes pulse{50%{opacity:.65}}
-.hint{font-size:12px;color:var(--mut);margin:0}
-.file{border:1px dashed var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;font-size:14px;color:var(--mut)}
-.file input{padding:8px;font-size:14px}
-#prev{max-width:90px;max-height:90px;border-radius:10px}
-.bar{position:fixed;inset-inline:0;bottom:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent)}
-.bar .in{max-width:560px;margin:0 auto}
-.big{padding:16px;font-size:18px;width:100%}.big:disabled{opacity:.5}
-.err{color:var(--err);font-size:14px;min-height:0;margin-bottom:6px}.err:empty{display:none}
+.badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;white-space:nowrap}
+
+form{display:grid;gap:14px}
+label{font-size:14px;font-weight:600;color:#334155;display:grid;gap:6px}
+label em{color:var(--err);font-style:normal}
+input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--text);font:400 16px "Cairo",inherit;outline:none;transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--a2);box-shadow:0 0 0 3px #2563eb22}
+textarea{resize:none;min-height:110px;line-height:1.6}
+.btn{border:0;border-radius:12px;padding:13px 16px;color:#fff;background:linear-gradient(90deg,var(--a1),var(--a2));font:700 16px "Cairo",inherit;cursor:pointer}
+.mic{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#eff4ff;color:var(--a2);border:1.5px solid #c7d7fe}
+.mic svg{width:20px;height:20px;fill:currentColor}
+.mic.on{background:#fee2e2;color:#b91c1c;border-color:#fecaca;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.hint{font-size:12px;color:var(--mut);margin:-6px 0 0}
+.file{border:1.5px dashed #c5cde0;border-radius:12px;padding:12px;display:grid;gap:8px;font-size:14px;font-weight:600;color:#334155;background:#fafbfe}
+.file input{padding:8px;font-size:14px;border-style:solid}
+#prev{max-width:80px;max-height:80px;border-radius:10px;border:1px solid var(--line)}
+
+.help{margin-top:16px;display:flex;align-items:center;gap:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:14px}
+.help p{margin:0;font-size:14px;color:#14532d;flex:1;line-height:1.6}
+.help a{flex:none;display:flex;align-items:center;gap:6px;background:var(--wa);color:#fff;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px}
+.help svg{width:20px;height:20px;fill:#fff}
+
+/* زرار الإرسال ثابت */
+.bar{flex:none;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px #0f172a0d;z-index:5}
+.big{width:100%;padding:15px;font-size:18px}.big:disabled{opacity:.55}
+.err{color:var(--err);font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.6}.err:empty{display:none}
+.err a{color:#15803d;font-weight:700}
 .hide{display:none!important}
-.ok{text-align:center;background:var(--card);border-radius:18px;padding:36px 18px;margin-top:20px}.ok h2{margin:0 0 10px;font-size:20px}.num{font-size:28px;font-weight:800;color:var(--a2);margin:12px 0}
+.ok{text-align:center;padding:36px 18px}.ok .chk{width:64px;height:64px;border-radius:50%;background:#dcfce7;color:#16a34a;font-size:34px;display:grid;place-items:center;margin:0 auto 14px}
+.ok h2{margin:0 0 10px;font-size:20px}.num{font-size:30px;font-weight:800;color:var(--a1);margin:10px 0}.ok div{color:var(--mut)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="brand">XERIA</div>
-  <h1>اطلب نظامك</h1>
-  <p class="sub">املأ بياناتك وفريقنا هيتواصل معاك</p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></symbol>
+</defs></svg>
 
-  <div id="formArea">
-    <h2 class="st">1) اختار الباقة</h2>
-    <div class="toggle"><button id="mBtn" class="on" type="button">شهريًا</button><button id="yBtn" type="button">سنويًا</button></div>
-    <div class="plans" id="plans"></div>
+<div class="app" id="app">
+  <header>
+    <div><div class="brand">XERIA</div><div class="tag">نظّم أعمالك ببساطة</div></div>
+    <a class="wa-h" id="waTop" href="#" target="_blank" rel="noopener" aria-label="تواصل معنا على واتساب"><svg><use href="#i-wa"/></svg></a>
+  </header>
 
-    <h2 class="st">2) بياناتك</h2>
-    <form id="f" novalidate>
-      <label>الاسم *<input id="fullName" maxlength="100" autocomplete="name"></label>
-      <label>رقم الهاتف (واتساب) *<input id="phone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel"></label>
-      <label>اسم النشاط *<input id="businessName" maxlength="100"></label>
-      <label>نوع النشاط *<select id="businessType"><option value="">اختر...</option></select></label>
-      <label id="otherWrap" class="hide">اكتب نوع نشاطك *<input id="otherType" maxlength="60"></label>
+  <main id="main">
+    <div id="formArea">
+      <h2 class="st"><i>1</i> اختار الباقة</h2>
+      <div class="toggle"><button id="mBtn" class="on" type="button">شهريًا</button><button id="yBtn" type="button">سنويًا</button></div>
+      <div class="plans" id="plans"></div>
 
-      <label>احتياجك (اختياري)
-        <textarea id="description" maxlength="1500" placeholder="اكتب هنا أو اضغط الميكروفون وتكلم"></textarea>
-      </label>
-      <button type="button" class="btn g mic" id="mic">🎙️ اتكلم بدل ما تكتب</button>
-      <p class="hint" id="micHint"></p>
+      <h2 class="st"><i>2</i> بياناتك</h2>
+      <div class="card">
+        <form id="f" novalidate>
+          <label><span>الاسم <em>*</em></span><input id="fullName" maxlength="100" autocomplete="name" placeholder="اسمك بالكامل"></label>
+          <label><span>رقم الهاتف (واتساب) <em>*</em></span><input id="phone" type="tel" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+          <label><span>اسم النشاط <em>*</em></span><input id="businessName" maxlength="100" placeholder="مثال: صيدلية النور"></label>
+          <label><span>نوع النشاط <em>*</em></span><select id="businessType"><option value="">اختر...</option></select></label>
+          <label id="otherWrap" class="hide"><span>اكتب نوع نشاطك <em>*</em></span><input id="otherType" maxlength="60"></label>
 
-      <div class="file">
-        <span>لوجو النشاط (اختياري)</span>
-        <input id="logo" type="file" accept="image/*">
-        <img id="prev" class="hide" alt="">
+          <label><span>احتياجك (اختياري)</span>
+            <textarea id="description" maxlength="1500" placeholder="اكتب هنا أو اضغط الميكروفون وتكلم"></textarea>
+          </label>
+          <button type="button" class="btn mic" id="mic"></button>
+          <p class="hint" id="micHint"></p>
+
+          <div class="file">
+            <span>لوجو النشاط (اختياري)</span>
+            <input id="logo" type="file" accept="image/*">
+            <img id="prev" class="hide" alt="">
+          </div>
+
+          <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;opacity:0">
+        </form>
       </div>
 
-      <input id="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;height:0;opacity:0">
-    </form>
-  </div>
+      <div class="help">
+        <p>واجهت مشكلة في تسجيل البيانات؟ ابعتلنا على واتساب وهنساعدك.</p>
+        <a id="waHelp" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>واتساب</a>
+      </div>
+    </div>
 
-  <div class="ok hide" id="ok">
-    <h2>تم استلام طلبك ✅</h2>
-    <div>رقم طلبك</div><div class="num" id="reqNum"></div>
-    <div>فريق XERIA هيتواصل معاك قريبًا.</div>
+    <div class="card ok hide" id="ok">
+      <div class="chk">✓</div>
+      <h2>تم استلام طلبك</h2>
+      <div>رقم طلبك</div><div class="num" id="reqNum"></div>
+      <div>فريق XERIA هيتواصل معاك قريبًا.</div>
+    </div>
+  </main>
+
+  <div class="bar" id="bar">
+    <div class="err" id="err"></div>
+    <button class="btn big" id="submit" type="button">إرسال الطلب</button>
   </div>
 </div>
-
-<div class="bar" id="bar"><div class="in">
-  <div class="err" id="err"></div>
-  <button class="btn big" id="submit" type="button">إرسال الطلب</button>
-</div></div>
 
 <script type="module">
 import { db, COL } from "./src/firebase.js";
 import { doc, collection, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const $ = id => document.getElementById(id);
+
+// ---------- ثبات الواجهة: منع التكبير بالقرصة، وإبقاء الهيدر والزرار في مكانهم مع الكيبورد ----------
+["gesturestart", "gesturechange", "gestureend"].forEach(t => document.addEventListener(t, e => e.preventDefault()));
+document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+const vv = window.visualViewport;
+const fit = () => { if (!vv || vv.scale <= 1.01) $("app").style.height = (vv ? vv.height : innerHeight) + "px"; };
+if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", () => scrollTo(0, 0)); } addEventListener("resize", fit); fit();
+
+// ---------- واتساب ----------
+const WA = "https://wa.me/201152155717?text=" + encodeURIComponent("مرحبًا، عندي مشكلة في تسجيل طلب على نموذج XERIA");
+$("waTop").href = WA; $("waHelp").href = WA;
+const WA_LINK = ` أو <a href="${WA}" target="_blank" rel="noopener">ابعتلنا على واتساب</a>.`;
 
 // ---------- الباقات ----------
 let P = { startMonthly:399,startYearly:3990,proMonthly:599,proYearly:5990,businessMonthly:899,businessYearly:8990 };
@@ -124,20 +175,48 @@ const TYPES = ["محل تجاري","بيع بالتقسيط","عيادة","مر�
 TYPES.forEach(t => $("businessType").add(new Option(t, t)));
 $("businessType").onchange = e => $("otherWrap").classList.toggle("hide", e.target.value !== "نشاط آخر");
 
-// ---------- الإملاء الصوتي: الكلام يتحول لنص داخل خانة الوصف (لا يُرسل صوت) ----------
+// ---------- الإملاء الصوتي (يتحول لنص، بدون تكرار) ----------
+// جلسة قصيرة (continuous=false) تُعاد تلقائيًا؛ نأخذ النتائج النهائية فقط ونتجاهل التراكمي المكرر الذي يظهر على أندرويد.
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, listening = false;
-const setMic = on => { listening = on; $("mic").classList.toggle("on", on); $("mic").textContent = on ? "⏹ إيقاف (بيسمعك...)" : "🎙️ اتكلم بدل ما تكتب"; };
-if (!SR) { $("mic").classList.add("hide"); $("micHint").textContent = "💡 تقدر تستخدم ميكروفون كيبورد الموبايل للكتابة بالصوت."; }
+let rec = null, wantOn = false, base = "";
+const micHTML = on => `<svg><use href="#i-mic"/></svg>${on ? "إيقاف الإملاء (بيسمعك...)" : "اتكلم بدل ما تكتب"}`;
+const setMic = on => { $("mic").classList.toggle("on", on); $("mic").innerHTML = micHTML(on); };
+const join = (a, b) => (a && b ? a.replace(/\s+$/, "") + " " + b : a + b);
+setMic(false);
+function startSession() {
+  if (!wantOn) return;
+  base = $("description").value.trim();
+  const finals = []; let gotAny = false;
+  rec = new SR(); rec.lang = "ar-EG"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 1;
+  rec.onresult = e => {
+    gotAny = true; let interim = "";
+    for (let i = 0; i < e.results.length; i++) {
+      const r = e.results[i], t = (r[0].transcript || "").trim(); if (!t) continue;
+      if (r.isFinal) {
+        const last = finals[finals.length - 1];
+        if (last === undefined) finals.push(t);
+        else if (t.startsWith(last)) finals[finals.length - 1] = t;   // نتيجة تراكمية: استبدال بدل الإلحاق
+        else if (!last.startsWith(t) && last !== t) finals.push(t);
+      } else interim = t;   // آخر نتيجة مؤقتة فقط
+    }
+    $("description").value = join(join(base, finals.join(" ")), interim).slice(0, 1500);
+  };
+  rec.onerror = e => {
+    if (e.error === "no-speech") return;   // onend يتولى القرار
+    wantOn = false;
+    $("err").textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? "اسمح للمتصفح باستخدام الميكروفون." : e.error === "network" ? "التحويل الصوتي محتاج إنترنت." : "";
+  };
+  rec.onend = () => {
+    const v = $("description").value; $("description").value = v.replace(/\s+/g, " ").trimStart();
+    if (wantOn && gotAny) setTimeout(startSession, 150);   // كمّل الاستماع بعد كل جملة
+    else { wantOn = false; setMic(false); }
+  };
+  try { rec.start(); } catch { wantOn = false; setMic(false); }
+}
+if (!SR) { $("mic").classList.add("hide"); $("micHint").textContent = "تقدر تستخدم ميكروفون كيبورد الموبايل للكتابة بالصوت."; }
 else $("mic").onclick = () => {
-  if (listening) { rec.stop(); return; }
-  $("err").textContent = "";
-  let base = $("description").value.trim(); if (base) base += " ";
-  rec = new SR(); rec.lang = "ar-EG"; rec.continuous = true; rec.interimResults = true;
-  rec.onresult = e => { $("description").value = (base + Array.from(e.results).map(r => r[0].transcript).join(" ")).slice(0, 1500); };
-  rec.onerror = e => { $("err").textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? "اسمح للمتصفح باستخدام الميكروفون." : e.error === "no-speech" ? "مسمعتش صوت، جرّب تاني." : e.error === "network" ? "التحويل الصوتي محتاج إنترنت." : ""; };
-  rec.onend = () => setMic(false);
-  try { rec.start(); setMic(true); } catch { setMic(false); }
+  if (wantOn) { wantOn = false; try { rec.stop(); } catch {} setMic(false); return; }
+  $("err").textContent = ""; wantOn = true; setMic(true); startSession();
 };
 
 // ---------- الشعار (يُصغَّر ويُحفظ داخل Firestore) ----------
@@ -154,10 +233,11 @@ $("logo").onchange = e => {
 };
 
 // ---------- الإرسال ----------
+const done = num => { $("reqNum").textContent = num; $("formArea").classList.add("hide"); $("bar").classList.add("hide"); $("ok").classList.remove("hide"); $("main").scrollTo(0, 0); };
 $("submit").onclick = async () => {
   const err = $("err"); err.textContent = "";
-  if ($("website").value) { $("formArea").classList.add("hide"); $("bar").classList.add("hide"); $("reqNum").textContent = "XR-000000"; $("ok").classList.remove("hide"); return; } // فخ للبوتات
-  if (listening && rec) rec.stop();
+  if ($("website").value) return done("XR-000000");   // فخ للبوتات
+  wantOn = false; try { rec && rec.stop(); } catch {}
   const v = id => $(id).value.trim();
   const type = v("businessType") === "نشاط آخر" ? v("otherType") : v("businessType");
   if (!v("fullName") || !v("phone") || !v("businessName") || !type) { err.textContent = "من فضلك أكمل الحقول المطلوبة (*)."; return; }
@@ -172,7 +252,7 @@ $("submit").onclick = async () => {
       const c = await tx.get(cntRef);
       const seq = c.exists() ? c.data().requestSeq + 1 : 1;
       tx.set(cntRef, { requestSeq: seq }, { merge: true });
-      tx.set(doc(db, "rateLimits", phoneKey), { lastAt: serverTimestamp() }); // طلب واحد لكل رقم كل 10 دقائق
+      tx.set(doc(db, "rateLimits", phoneKey), { lastAt: serverTimestamp() });   // طلب واحد لكل رقم كل 10 دقائق
       const num = "XR-" + String(seq).padStart(6, "0");
       tx.set(custRef, { fullName: v("fullName"), phone: v("phone"), whatsapp: "", businessName: v("businessName"),
         businessType: type, governorate: "", city: "", branchesCount: 1, expectedUsers: 1,
@@ -183,9 +263,10 @@ $("submit").onclick = async () => {
         createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
       return num;
     });
-    $("reqNum").textContent = number; $("formArea").classList.add("hide"); $("bar").classList.add("hide"); $("ok").classList.remove("hide"); scrollTo(0,0);
+    done(number);
   } catch (x) {
-    console.error(x); err.textContent = x.code === "permission-denied" ? "تعذّر الإرسال: ممكن يكون فيه طلب من نفس الرقم خلال آخر 10 دقائق. فريقنا هيتواصل معاك قريبًا." : "حصل خطأ أثناء الإرسال، حاول تاني.";
+    console.error(x);
+    err.innerHTML = (x.code === "permission-denied" ? "تعذّر الإرسال: ممكن يكون فيه طلب من نفس الرقم خلال آخر 10 دقائق، حاول بعد شوية" : "حصل خطأ أثناء الإرسال، حاول تاني") + WA_LINK;
     $("submit").disabled = false; $("submit").textContent = "إرسال الطلب";
   }
 };
